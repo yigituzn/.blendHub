@@ -1,25 +1,21 @@
 <?php
-$error_message = ''; // Hata mesajını tutmak için
+$error_message = '';
 
-// Veritabanı bağlantısı
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "blendhub";
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Bağlantıyı kontrol et
 if ($conn->connect_error) {
     die("Bağlantı hatası: " . $conn->connect_error);
 }
 
-// Form gönderildiğinde
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $newPassword = $_POST['new_password'];
     $confirmPassword = $_POST['confirm_password'];
 
-    // Şifrelerin uyuşup uyuşmadığını kontrol et
     if ($newPassword !== $confirmPassword) {
         $error_message = 'Şifreler uyuşmuyor! Lütfen tekrar deneyin.';
     } else {

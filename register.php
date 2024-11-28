@@ -34,17 +34,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->num_rows > 0) {
             $error_message = 'Bu e-posta zaten kayıtlı!';
         } else {
-            // Şifreyi hash'le
-            //$hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+            // Benzersiz slug oluştur
+            $slug = strtolower(str_replace(' ', '-', $fullname)) . '-' . rand(1000, 9999);
 
-            // Veritabanına kaydet
-            $sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
+            // Slug'ın benzersizliğini kontrol et
+            $checkSlugSql = "SELECT user_id FROM users WHERE slug = ?";
+            $slugStmt = $conn->prepare($checkSlugSql);
+            $slugStmt->bind_param("s", $slug);
+            $slugStmt->execute();
+            $slugStmt->store_result();
+
+            while ($slugStmt->num_rows > 0) {
+                $slug = strtolower(str_replace(' ', '-', $fullname)) . '-' . rand(1000, 9999);
+                $slugStmt->execute();
+            }
+
+            $slugStmt->close();
+
+            $sql = "INSERT INTO users (username, email, password, slug) VALUES (?, ?, ?, ?)";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("sss", $fullname, $email, $password);
+            $stmt->bind_param("ssss", $fullname, $email, $password, $slug);
 
             if ($stmt->execute()) {
                 echo "<script>alert('Kayıt başarılı! Giriş yapabilirsiniz.'); window.location.href = 'login.php';</script>";
-                exit; // İşlemi burada sonlandır
+                exit;
             } else {
                 $error_message = 'Kayıt başarısız: ' . $stmt->error;
             }

@@ -6,6 +6,26 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "blendhub";
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Bağlantı hatası: " . $conn->connect_error);
+}
+
+$sql = "SELECT username, slug, profile_picture FROM users ORDER BY created_at DESC LIMIT 3";
+$result = $conn->query($sql);
+
+$authors = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $authors[] = $row; // Kullanıcıları diziye ekle
+    }
+}
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="tr-TR"><head>
@@ -22,48 +42,14 @@ if (!isset($_SESSION['user_id'])) {
 
   <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
   <link rel="icon" href="images/favicon.png" type="image/x-icon">
-  <style>
-    /* Profil resmi boyutu ve stil */
-    .dropdown img {
-      vertical-align: middle; /* Dikey olarak hizalar */
-      margin: 0; /* Fazladan boşluk bırakmaz */
-      border: 2px solid #ffffff; /* Beyaz kenarlık */
-      cursor: pointer;
-    }
-    /* Açılır menü stili */
-    .dropdown-menu {
-      min-width: 200px; /* Genişlik */
-      border-radius: 8px; /* Yuvarlak köşeler */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Hafif gölge */
-    }
-
-    .dropdown-menu a {
-      color: #333; /* Yazı rengi */
-      padding: 10px 15px; /* İç boşluk */
-      text-decoration: none; /* Alt çizgi yok */
-    }
-
-    .dropdown-menu a:hover {
-      background-color: #f0f0f0; /* Üzerine gelince arka plan */
-    }
-    .default-profile {
-      background-image: url('images/dprofile.jpg');
-      background-size: cover;
-      background-position: center;
-      transform: translateY(+20%);
-      width: 40px;
-      height: 40px;
-      border-radius: 50%; /* Yuvarlak yapar */
-    }
-  </style>
+  <link rel="stylesheet" href="../css/profilephoto.css">
 </head>
 <body>
 <header class="navigation fixed-top">
   <div class="container">
     <nav class="navbar navbar-expand-lg navbar-white">
       <a class="navbar-brand order-1" href="index.php">
-        <img class="img-fluid" width="100px" src="images/logo.png"
-          alt="Reader | Hugo Personal Blog Template">
+        <img class="img-fluid" width="100px" src="images/logo.png">
       </a>
       <div class="collapse navbar-collapse text-center order-lg-2 order-3" id="navigation">
         <ul class="navbar-nav mx-auto">
@@ -96,7 +82,7 @@ if (!isset($_SESSION['user_id'])) {
           <li class="nav-item dropdown">
             <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
               aria-expanded="false">
-              hakkımızda <i class="ti-angle-down ml-1"></i>
+              yazılar <i class="ti-angle-down ml-1"></i>
             </a>
             <div class="dropdown-menu">
               
@@ -108,12 +94,12 @@ if (!isset($_SESSION['user_id'])) {
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="contact.html">Contact</a>
+            <a class="nav-link" href="contact.html">mentörler</a>
           </li>
 
           <li class="nav-item dropdown">
             <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false">Pages <i class="ti-angle-down ml-1"></i>
+              aria-expanded="false">hakkımızda <i class="ti-angle-down ml-1"></i>
             </a>
             <div class="dropdown-menu">
               
@@ -143,7 +129,10 @@ if (!isset($_SESSION['user_id'])) {
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="shop.html">Shop</a>
+            <a class="nav-link" href="shop.html">Yardım</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="shop.html">İletişim</a>
           </li>
         </ul>
       </div>
@@ -159,10 +148,14 @@ if (!isset($_SESSION['user_id'])) {
         </button>
         <div class="dropdown" style="margin-left: 25px;">
             <a href="#" class="dropdown-toggle" id="profileDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <div class="default-profile"></div>
+            <?php if (!empty($_SESSION['profile_picture'])): ?>
+              <img src="data:image/jpeg;base64,<?php echo htmlspecialchars($_SESSION['profile_picture']); ?>" alt="Profil Fotoğrafı" width="40" height="40" class="rounded-circle">
+            <?php else: ?>
+              <img src="images/dprofile.jpg" alt="Varsayılan Profil Fotoğrafı" width="40" height="40" class="rounded-circle">
+            <?php endif; ?>
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
-              <a class="dropdown-item" href="profile.php">Profilim</a>
+            <a class="dropdown-item" href="profile.php?slug=<?php echo $_SESSION['slug']; ?>">Profilim</a>
               <a class="dropdown-item" href="settings.php">Ayarlar</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="logout.php" onclick="return confirm('Çıkış yapmak istediğinize emin misiniz?');">Çıkış Yap</a>
@@ -179,7 +172,7 @@ if (!isset($_SESSION['user_id'])) {
   <div class="container">
     <div class="row">
       <div class="col-lg-9 mx-auto">
-        <h1 class="mb-5">Esmanur <br> Like To Read Today?</h1>
+        <h1 class="mb-5"><? echo $_SESSION['username'];?>Esmanur <br> Like To Read Today?</h1>
         <ul class="list-inline widget-list-inline">
           <li class="list-inline-item"><a href="tags.html">City</a></li>
           <li class="list-inline-item"><a href="tags.html">Color</a></li>
@@ -630,34 +623,26 @@ if (!isset($_SESSION['user_id'])) {
 
   <div class="widget widget-author">
     <h4 class="widget-title">Authors</h4>
-    <div class="media align-items-center">
-      <div class="mr-3">
-        <img class="widget-author-image" src="images/john-doe.jpg">
-      </div>
-      <div class="media-body">
-        <h5 class="mb-1"><a class="post-title" href="author-single.html">Charls Xaviar</a></h5>
-        <span>Author &amp; developer of Bexer, Biztrox theme</span>
-      </div>
-    </div>
-    <div class="media align-items-center">
-      <div class="mr-3">
-        <img class="widget-author-image" src="images/kate-stone.jpg">
-      </div>
-      <div class="media-body">
-        <h5 class="mb-1"><a class="post-title" href="author-single.html">Kate Stone</a></h5>
-        <span>Author &amp; developer of Bexer, Biztrox theme</span>
-      </div>
-    </div>
-    <div class="media align-items-center">
-      <div class="mr-3">
-        <img class="widget-author-image" src="images/john-doe.jpg" alt="John Doe">
-      </div>
-      <div class="media-body">
-        <h5 class="mb-1"><a class="post-title" href="author-single.html">John Doe</a></h5>
-        <span>Author &amp; developer of Bexer, Biztrox theme</span>
-      </div>
-    </div>
-  </div>
+    <?php foreach ($authors as $author): ?>
+        <div class="media align-items-center">
+            <div class="mr-3">
+                <img class="widget-author-image" 
+                     src="<?php echo !empty($author['profile_picture']) ? 'data:image/png;base64,' . $author['profile_picture'] : 'images/dprofile.jpg'; ?>" 
+                     alt="<?php echo htmlspecialchars($author['username']); ?>">
+            </div>
+            <div class="media-body">
+                <h5 class="mb-1">
+                    <a class="post-title" href="profile.php?slug=<?php echo urlencode($author['slug']); ?>">
+                        <?php echo htmlspecialchars($author['username']); ?>
+                    </a>
+                </h5>
+                <span>Author &amp; Developer</span>
+            </div>
+        </div>
+    <?php endforeach; ?>
+</div>
+
+  
   
   <div class="widget">
     <h4 class="widget-title"><span>Never Miss A News</span></h4>
