@@ -1,15 +1,7 @@
 <?php
 $error_message = '';
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "blendhub";
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Bağlantı hatası: " . $conn->connect_error);
-}
+include 'db_connection.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];

@@ -7,16 +7,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Veritabanı bağlantısı
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "blendhub";
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Bağlantı hatası: " . $conn->connect_error);
-}
+include 'db_connection.php';
 
 $user_id = $_SESSION['user_id'];
 $error_message = '';

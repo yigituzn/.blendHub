@@ -6,15 +6,7 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "blendhub";
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Bağlantı hatası: " . $conn->connect_error);
-}
+include 'db_connection.php';
 
 $sql = "SELECT username, slug, profile_picture FROM users ORDER BY created_at DESC LIMIT 3";
 $result = $conn->query($sql);
@@ -43,8 +35,99 @@ $conn->close();
   <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
   <link rel="icon" href="images/favicon.png" type="image/x-icon">
   <link rel="stylesheet" href="../css/profilephoto.css">
+  <style>
+/* Sohbet balonu */
+#chat-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+#chat-button {
+  background-color: #007bff;
+  color: #fff;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+#chat-box {
+  width: 300px;
+  height: 400px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#chat-header {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
+
+#chat-messages {
+  flex-grow: 1;
+  padding: 10px;
+  overflow-y: auto;
+  font-size: 14px;
+  border-top: 1px solid #eaeaea;
+  border-bottom: 1px solid #eaeaea;
+}
+
+#chat-form {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #eaeaea;
+}
+
+#chat-input {
+  flex-grow: 1;
+  border: 1px solid #eaeaea;
+  border-radius: 5px;
+  padding: 5px;
+  margin-right: 10px;
+}
+
+#chat-form button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+    </style>
 </head>
 <body>
+<div id="chat-widget">
+  <div id="chat-button" onclick="toggleChat()">
+    💬
+  </div>
+  <div id="chat-box" class="d-none">
+    <div id="chat-header">
+      <span>Mentörlerle Sohbet</span>
+      <button onclick="toggleChat()">✖</button>
+    </div>
+    <div id="chat-messages"></div>
+    <form id="chat-form">
+      <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." required />
+      <button type="submit">Gönder</button>
+    </form>
+  </div>
+</div>
 <header class="navigation fixed-top">
   <div class="container">
     <nav class="navbar navbar-expand-lg navbar-white">
@@ -172,7 +255,7 @@ $conn->close();
   <div class="container">
     <div class="row">
       <div class="col-lg-9 mx-auto">
-        <h1 class="mb-5"><? echo $_SESSION['username'];?>Esmanur <br> Like To Read Today?</h1>
+        <h1 class="mb-5">Esmanur <br> Like To Read Today?</h1>
         <ul class="list-inline widget-list-inline">
           <li class="list-inline-item"><a href="tags.html">City</a></li>
           <li class="list-inline-item"><a href="tags.html">Color</a></li>
@@ -381,6 +464,113 @@ $conn->close();
     <div class="row justify-content-center">
       <div class="col-lg-8  mb-5 mb-lg-0">
   <h2 class="h5 section-title">Recent Post</h2>
+  <?php
+// Veritabanı bağlantısını yapın
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "blendhub";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Bağlantıyı kontrol edin
+if ($conn->connect_error) {
+    die("Bağlantı hatası: " . $conn->connect_error);
+}
+
+// Veritabanından son 5 blog gönderisini çekin
+$query = "SELECT posts.*, users.username, users.profile_picture FROM posts 
+          INNER JOIN users ON posts.user_id = users.user_id 
+          WHERE posts.status = 'published' 
+          ORDER BY posts.created_at DESC 
+          LIMIT 5";
+
+$result = $conn->query($query);
+
+setlocale(LC_TIME, 'tr_TR.UTF-8', 'turkish');
+
+// Fonksiyon: Okuma süresi hesaplama
+function calculateReadingTime($content, $words_per_minute = 200) {
+    $cleaned_content = strip_tags($content);
+    $cleaned_content = preg_replace('/[^\w\s]/u', '', $cleaned_content); // Noktalama işaretlerini kaldır
+    $cleaned_content = trim(preg_replace('/\s+/', ' ', $cleaned_content)); // Çoklu boşlukları temizle
+    $word_count = str_word_count($cleaned_content);
+
+    if ($word_count === 0) {
+        return 1; // Minimum okuma süresi
+    }
+
+    return ceil($word_count / $words_per_minute);
+}
+
+// Blog içeriklerini çek ve listele
+while ($row = $result->fetch_assoc()) :
+    $content = $row['content'];
+    $reading_time = calculateReadingTime($content);
+    $post_id = $row['post_id'];
+?>
+<article class="card mb-4">
+    <div class="post-slider">
+    <?php if (!empty($row['featured_image'])) : ?>
+      <img src="data:image/jpeg;base64,<?php echo $row['featured_image']; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($row['title'], ENT_QUOTES, 'UTF-8'); ?>">
+    <?php endif; ?>
+
+    </div>
+    <div class="card-body">
+        <h3 class="mb-3">
+            <a class="post-title" href="post-details.php?post_id=<?php echo $post_id; ?>">
+                <?php echo htmlspecialchars($row['title'], ENT_QUOTES, 'UTF-8'); ?>
+            </a>
+        </h3>
+        <ul class="card-meta list-inline">
+            <li class="list-inline-item">
+                <a href="profile.php?slug=<?php echo $row['username']; ?>" class="card-meta-author">
+                    <img src="<?php echo !empty($row['profile_picture']) ? 'uploads/' . $row['profile_picture'] : 'images/dprofile.jpg'; ?>" alt="<?php echo htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8'); ?>">
+                    <span><?php echo htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8'); ?></span>
+                </a>
+            </li>
+            <li class="list-inline-item">
+                <i class="ti-timer"></i> <?php echo $reading_time; ?> Min To Read
+            </li>
+            <li class="list-inline-item">
+                <i class="ti-calendar"></i> <?php 
+                  $tarih = $row['created_at'];
+                  $date = new DateTime($tarih);
+
+                  $formatter = new IntlDateFormatter('tr_TR', IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+                  echo $formatter->format($date);?>
+            </li>
+            <li class="list-inline-item">
+                <ul class="card-meta-tag list-inline">
+                    <?php
+                    $category_query = "SELECT categories.name AS category_name 
+                                       FROM postcategories 
+                                       JOIN categories ON postcategories.category_id = categories.category_id 
+                                       WHERE postcategories.post_id = ?";
+                    $category_stmt = $conn->prepare($category_query);
+                    $category_stmt->bind_param("i", $post_id);
+                    $category_stmt->execute();
+                    $categories_result = $category_stmt->get_result();
+
+                    while ($category = $categories_result->fetch_assoc()) :
+                    ?>
+                        <li class="list-inline-item">
+                            <a href="categories.php?category=<?php echo urlencode($category['category_name']); ?>">
+                                <?php echo htmlspecialchars($category['category_name'], ENT_QUOTES, 'UTF-8'); ?>
+                            </a>
+                        </li>
+                    <?php endwhile; ?>
+                </ul>
+            </li>
+        </ul>
+        <p>
+            <?php echo htmlspecialchars(substr($content, 0, 150), ENT_QUOTES, 'UTF-8') . '...'; ?>
+        </p>
+        <a href="post-details.php?post_id=<?php echo $post_id; ?>" class="btn btn-outline-primary">Read More</a>
+    </div>
+</article>
+<?php endwhile; ?>
+
   <article class="card mb-4">
   <div class="post-slider">
       <img src="images/post/post-10.jpg" class="card-img-top" alt="post-thumb">
@@ -583,6 +773,73 @@ $conn->close();
   </ul>
 </div>
       <aside class="col-lg-4 sidebar-home">
+
+<div class="widget">
+  <h4 class="widget-title"><span>BLOG PAYLAŞ!</span></h4> 
+    <button type="submit" id="addPostBtn" class="btn btn-primary btn-block" name="post-share" data-toggle="modal" data-target="#addPostModal">Blog Paylaş</button>
+</div>
+<div id="addPostModal" class="modal" tabindex="-1" role="dialog" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">
+  <div class="modal-dialog modal-dialog-centered" role="document" style="border-radius: 8px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Yeni Blog Gönderisi</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="addPostForm" method="POST" action="add_post.php" enctype="multipart/form-data">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="postTitle">Başlık</label>
+            <input type="text" class="form-control" id="postTitle" name="title" required>
+          </div>
+          <div class="form-group">
+            <label for="postContent">İçerik</label>
+            <textarea class="form-control" id="postContent" name="content" rows="5" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="featuredImage">Öne Çıkan Resim</label>
+            <input type="file" class="form-control-file" id="featuredImage" name="featured_image" accept=".jpg,.jpeg,.png">
+            <small class="form-text text-muted">Sadece JPG ve PNG formatında, maksimum 5MB.</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Paylaş</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+      <!-- Mentör Ol Button -->
+<div class="widget">
+    <h4 class="widget-title"><span>Sen de mentörlerimiz arasına katılmak ister misin?</span></h4>
+      <button type="submit" id="mentorButton" class="btn btn-primary btn-block" name="subscribe" data-toggle="modal" data-target="#mentorModal">Mentör Ol</button>
+  </div>
+
+<!-- Mentör Ol Modal -->
+<div id="mentorModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div class="modal-content" style="background: #fff; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px;">
+        <h3>Mentörlük Başvuru Formu</h3>
+        <form id="mentorForm" method="POST" action="mentor_application.php">
+            <div class="form-group">
+                <label for="fullName">Ad Soyad</label>
+                <input type="text" id="fullName" name="fullName" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="email">E-posta</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="expertise">Uzmanlık Alanı</label>
+                <input type="text" id="expertise" name="expertise" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-success">Başvur</button>
+            <button type="button" id="closeModal" class="btn btn-secondary">İptal</button>
+        </form>
+    </div>
+</div>  
   <div class="widget">
     <h4 class="widget-title"><span>Search</span></h4>
     <form action="#!" class="widget-search">
@@ -811,7 +1068,99 @@ $conn->close();
       </div>
   </div>
   </footer>
+  <script>
+    // Modal Açma ve Kapatma İşlevleri
+    const mentorButton = document.getElementById('mentorButton');
+    const mentorModal = document.getElementById('mentorModal');
+    const closeModal = document.getElementById('closeModal');
 
+    mentorButton.addEventListener('click', () => {
+        mentorModal.style.display = 'flex';
+    });
+
+    closeModal.addEventListener('click', () => {
+        mentorModal.style.display = 'none';
+    });
+
+    // Modalı tıklayınca kapatma
+    window.addEventListener('click', (event) => {
+        if (event.target === mentorModal) {
+            mentorModal.style.display = 'none';
+        }
+    });
+  </script>
+  <script>
+    document.getElementById('addPostForm').addEventListener('submit', function(event) {
+        const fileInput = document.getElementById('featuredImage');
+        const file = fileInput.files[0];
+
+        if (file) {
+            const allowedTypes = ['image/jpeg', 'image/png'];
+            const maxSize = 5 * 1024 * 1024; // 5MB
+
+            // Dosya türü kontrolü
+            if (!allowedTypes.includes(file.type)) {
+                alert('Yalnızca JPG ve PNG dosyaları kabul edilmektedir.');
+                event.preventDefault();
+                return;
+            }
+
+            // Dosya boyutu kontrolü
+            if (file.size > maxSize) {
+                alert('Dosya boyutu 5MB\'yi geçemez.');
+                event.preventDefault();
+                return;
+            }
+        }
+    });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const chatForm = document.getElementById('chat-form');
+    const chatMessages = document.getElementById('chat-messages');
+
+    chatForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const message = document.getElementById('chat-input').value;
+        if (message.trim() !== '') {
+            appendMessage('Kullanıcı', message);
+            document.getElementById('chat-input').value = '';
+
+            // Sunucuya mesaj gönder
+            sendMessageToServer(message);
+        }
+    });
+
+    function appendMessage(sender, message) {
+        const messageElement = document.createElement('div');
+        messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight; // Otomatik kaydırma
+    }
+
+    function sendMessageToServer(message) {
+        // AJAX isteğiyle mesajı sunucuya gönder
+        fetch('chat_server.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.reply) {
+                    appendMessage('Mentör', data.reply);
+                }
+            });
+    }
+});
+
+function toggleChat() {
+    const chatBox = document.getElementById('chat-box');
+    chatBox.classList.toggle('d-none');
+}
+</script>
   <script src="plugins/jQuery/jquery.min.js"></script>
 
   <script src="plugins/bootstrap/bootstrap.min.js"></script>
