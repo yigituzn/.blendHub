@@ -36,98 +36,179 @@ $conn->close();
   <link rel="icon" href="images/favicon.png" type="image/x-icon">
   <link rel="stylesheet" href="../css/profilephoto.css">
   <style>
-/* Sohbet balonu */
-#chat-widget {
+/* Sohbet Widget */
+.chat-widget {
   position: fixed;
   bottom: 20px;
   right: 20px;
+  width: 350px;
+  height: 500px; /* Sabit yükseklik */
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
   z-index: 9999;
 }
 
-#chat-button {
-  background-color: #007bff;
-  color: #fff;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-}
-
-#chat-box {
-  width: 300px;
-  height: 400px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-#chat-header {
-  background-color: #007bff;
-  color: #fff;
+.chat-header {
+  background: #21ad26;
+  color: white;
   padding: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-weight: bold;
 }
 
-#chat-messages {
-  flex-grow: 1;
-  padding: 10px;
-  overflow-y: auto;
-  font-size: 14px;
-  border-top: 1px solid #eaeaea;
-  border-bottom: 1px solid #eaeaea;
+.chat-header button {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
 }
 
-#chat-form {
+/* Sohbet İçeriği */
+.chat-content {
   display: flex;
-  padding: 10px;
-  border-top: 1px solid #eaeaea;
+  flex-direction: column;
+  height: 100%;
 }
 
-#chat-input {
-  flex-grow: 1;
-  border: 1px solid #eaeaea;
-  border-radius: 5px;
-  padding: 5px;
+.mentor-list {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  overflow-y: auto;
+  max-height: 150px;
+  max-height: calc(100% - 50px);
+}
+
+/* Mentör Listesi */
+.mentor-item {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.mentor-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   margin-right: 10px;
 }
 
-#chat-form button {
-  background-color: #007bff;
-  color: #fff;
+.mentor-list.hidden {
+  display: none; /* Mentör listesi gizlemek için */
+}
+
+.chat-box {
+  display: none; /* Başlangıçta gizli */
+  flex-grow: 1;
+  flex-direction: column;
+  max-height: calc(100% - 50px);
+  overflow-y: auto;
+}
+
+.chat-box.active {
+  display: flex; /* Mentöre tıklandığında görünür */
+}
+
+.messages {
+  flex-grow: 1;
+  padding: 10px;
+  overflow-y: auto;
+  border-top: 1px solid #ccc;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
   border: none;
-  border-radius: 5px;
-  padding: 5px 10px;
+  border-top: 1px solid #ccc;
+  resize: none;
+}
+
+#send-btn {
+  background: #21ad26;
+  color: white;
+  border: none;
+  padding: 10px;
   cursor: pointer;
+}
+
+.chat-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background: #21ad26;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10000;
+}
+#back-btn {
+  font-size: 16px;
+  margin-right: 10px;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: none; /* Başlangıçta gizli */
+}
+
+/* Sohbet ekranı aktifken geri butonu görünsün */
+.chat-box.active #back-btn {
+  display: inline-block;
+}
+.messages {
+  padding: 10px;
+  overflow-y: auto; /* Kaydırılabilir içerik */
+  max-height: 400px; /* Sabit yüksekliği koru */
+}
+
+/* Soldaki mesajlar (karşı tarafın mesajları) */
+.message-left {
+  text-align: left; /* Yazıyı sola hizala */
+  color: #000; /* Siyah yazı */
+  margin: 5px 0;
+  padding: 5px;
+}
+
+/* Sağdaki mesajlar (kullanıcının mesajları) */
+.message-right {
+  text-align: right; /* Yazıyı sağa hizala */
+  color: #007bff; /* Mavi yazı */
+  margin: 5px 0;
+  padding: 5px;
 }
     </style>
 </head>
 <body>
-<div id="chat-widget">
-  <div id="chat-button" onclick="toggleChat()">
-    💬
+<div class="chat-widget">
+  <div class="chat-header">
+    <button id="back-btn" onclick="goBackToList()" style="display: none;">&larr;</button>
+    <span id="chat-header-title">Mentörler ile Canlı Sohbet</span>
+    <button id="close-btn" onclick="toggleChat()">&times;</button>
   </div>
-  <div id="chat-box" class="d-none">
-    <div id="chat-header">
-      <span>Mentörlerle Sohbet</span>
-      <button onclick="toggleChat()">✖</button>
+    <div class="chat-content">
+      <div class="mentor-list" id="mentor-list"></div>
+      <div class="chat-box" id="chat-box">
+        <div class="messages" id="messages"></div>
+        <textarea id="message-input" placeholder="Mesajınızı yazın..."></textarea>
+        <button id="send-btn" onclick="sendMessage()">Gönder</button>
+      </div>
     </div>
-    <div id="chat-messages"></div>
-    <form id="chat-form">
-      <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." required />
-      <button type="submit">Gönder</button>
-    </form>
   </div>
-</div>
+
+  <div class="chat-toggle" onclick="toggleChat()">
+  💬
+  </div>
 <header class="navigation fixed-top">
   <div class="container">
     <nav class="navbar navbar-expand-lg navbar-white">
@@ -1068,99 +1149,158 @@ while ($row = $result->fetch_assoc()) :
       </div>
   </div>
   </footer>
+
   <script>
-    // Modal Açma ve Kapatma İşlevleri
-    const mentorButton = document.getElementById('mentorButton');
-    const mentorModal = document.getElementById('mentorModal');
-    const closeModal = document.getElementById('closeModal');
+async function updateChatHeader() {
+  const response = await fetch('get_user_role.php');
+  const { role } = await response.json(); // Kullanıcı rolünü al
+  const chatHeader = document.querySelector('.chat-header span');
+  chatHeader.textContent = role === 'mentor' 
+    ? 'Kullanıcılar ile Canlı Sohbet' 
+    : 'Mentörler ile Canlı Sohbet';
+}
 
-    mentorButton.addEventListener('click', () => {
-        mentorModal.style.display = 'flex';
-    });
-
-    closeModal.addEventListener('click', () => {
-        mentorModal.style.display = 'none';
-    });
-
-    // Modalı tıklayınca kapatma
-    window.addEventListener('click', (event) => {
-        if (event.target === mentorModal) {
-            mentorModal.style.display = 'none';
-        }
-    });
-  </script>
-  <script>
-    document.getElementById('addPostForm').addEventListener('submit', function(event) {
-        const fileInput = document.getElementById('featuredImage');
-        const file = fileInput.files[0];
-
-        if (file) {
-            const allowedTypes = ['image/jpeg', 'image/png'];
-            const maxSize = 5 * 1024 * 1024; // 5MB
-
-            // Dosya türü kontrolü
-            if (!allowedTypes.includes(file.type)) {
-                alert('Yalnızca JPG ve PNG dosyaları kabul edilmektedir.');
-                event.preventDefault();
-                return;
-            }
-
-            // Dosya boyutu kontrolü
-            if (file.size > maxSize) {
-                alert('Dosya boyutu 5MB\'yi geçemez.');
-                event.preventDefault();
-                return;
-            }
-        }
-    });
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const chatForm = document.getElementById('chat-form');
-    const chatMessages = document.getElementById('chat-messages');
-
-    chatForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const message = document.getElementById('chat-input').value;
-        if (message.trim() !== '') {
-            appendMessage('Kullanıcı', message);
-            document.getElementById('chat-input').value = '';
-
-            // Sunucuya mesaj gönder
-            sendMessageToServer(message);
-        }
-    });
-
-    function appendMessage(sender, message) {
-        const messageElement = document.createElement('div');
-        messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
-        chatMessages.appendChild(messageElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight; // Otomatik kaydırma
-    }
-
-    function sendMessageToServer(message) {
-        // AJAX isteğiyle mesajı sunucuya gönder
-        fetch('chat_server.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ message }),
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.reply) {
-                    appendMessage('Mentör', data.reply);
-                }
-            });
-    }
+document.addEventListener('DOMContentLoaded', () => {
+  updateChatHeader(); // Başlığı güncelle
+  loadChatList(); // Sohbet listesi yüklensin
 });
 
-function toggleChat() {
-    const chatBox = document.getElementById('chat-box');
-    chatBox.classList.toggle('d-none');
+async function loadChatList() {
+  const response = await fetch('get_chat_list.php');
+  const chatList = await response.json();
+  const mentorList = document.getElementById('mentor-list');
+  mentorList.innerHTML = '';
+  chatList.forEach(person => {
+    const div = document.createElement('div');
+    div.className = 'mentor-item';
+    div.innerHTML = person.profile_picture 
+                    ? `<img src="data:image/jpeg;base64,${person.profile_picture}" alt="${person.username}">`
+                    : `<img src="images/dprofile.jpg" alt="Default Profile Picture">`;
+    div.innerHTML += `<span>${person.username}</span>`;
+    div.onclick = () => openChat(person.user_id, person.username);
+    mentorList.appendChild(div);
+  });
 }
-</script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadChatList(); // Sohbet listesi yüklensin
+});
+
+let chatInterval;
+
+function toggleChat() {
+  const chatWidget = document.querySelector('.chat-widget');
+  const chatToggle = document.querySelector('.chat-toggle');
+  const chatBox = document.getElementById('chat-box');
+  const mentorList = document.getElementById('mentor-list');
+  const backBtn = document.getElementById('back-btn');
+
+  // Sohbet widget'ını aç/kapa
+  if (chatWidget.style.display === 'flex') {
+    chatWidget.style.display = 'none'; // Kapat
+    chatToggle.style.display = 'flex'; // Balon görünsün
+    chatBox.classList.remove('active'); // Sohbet ekranını gizle
+    mentorList.style.display = 'block'; // Mentör listesi gösterilsin
+    backBtn.style.display = 'none'; // Geri butonunu gizle
+
+    // Mesaj yenileme intervalini durdur
+    if (chatInterval) {
+      clearInterval(chatInterval);
+    }
+  } else {
+    chatWidget.style.display = 'flex'; // Aç
+    chatToggle.style.display = 'none'; // Balon gizlensin
+  }
+}
+
+function openChat(mentorId, mentorName) {
+  const chatBox = document.getElementById('chat-box');
+  const messagesDiv = document.getElementById('messages');
+  const mentorList = document.getElementById('mentor-list');
+  const backBtn = document.getElementById('back-btn');
+
+  mentorList.style.display = 'none'; // Mentör listesini gizle
+  chatBox.dataset.mentorId = mentorId;
+  chatBox.classList.add('active'); // Sohbet ekranını görünür yap
+  backBtn.style.display = 'inline-block'; // Geri butonunu göster
+  messagesDiv.innerHTML = `<h3>${mentorName} ile sohbet</h3>`; // Başlığı güncelle
+  loadMessages(mentorId); // Mesajları yükle
+
+  // Daha önceki interval varsa temizle
+  if (chatInterval) {
+    clearInterval(chatInterval);
+  }
+
+  // Mesajları otomatik yenile
+  chatInterval = setInterval(() => {
+    loadMessages(mentorId);
+  }, 2000);
+}
+
+function goBackToList() {
+  const chatBox = document.getElementById('chat-box');
+  const mentorList = document.getElementById('mentor-list');
+  const backBtn = document.getElementById('back-btn');
+
+  chatBox.classList.remove('active'); // Sohbet ekranını gizle
+  mentorList.style.display = 'block'; // Liste ekranını göster
+  backBtn.style.display = 'none'; // Geri butonunu gizle
+
+  if (chatInterval) {
+    clearInterval(chatInterval); // Mesaj yenileme intervalini durdur
+  }
+}
+
+function closeChat() {
+  const chatBox = document.getElementById('chat-box');
+  const mentorList = document.getElementById('mentor-list');
+  chatBox.classList.remove('active');
+  mentorList.style.display = 'block'; // Mentör listesini tekrar göster
+  if (chatInterval) {
+    clearInterval(chatInterval); // Interval durdur
+  }
+}
+
+async function loadMessages(mentorId) {
+  const response = await fetch(`get_messages.php?mentorId=${mentorId}`);
+  const messages = await response.json();
+  const messagesDiv = document.getElementById('messages');
+  messagesDiv.innerHTML = ''; // Önceki mesajları temizle
+  messages.forEach(message => {
+    const isCurrentUser = message.is_current_user;
+    const div = document.createElement('div');
+    div.className = message.is_current_user == 1 ? 'message-right' : 'message-left';
+    if (isCurrentUser === '1') {
+      div.innerHTML = `<span>${message.message}</span>`;
+    } else {
+      div.innerHTML = `<strong>${message.sender_name}:</strong> <span>${message.message}</span>`;
+    }
+   messagesDiv.appendChild(div);
+  });
+}
+
+async function sendMessage() {
+  const mentorId = document.getElementById('chat-box').dataset.mentorId;
+  const messageInput = document.getElementById('message-input');
+  const message = messageInput.value;
+  if (message.trim()) {
+    const response = await fetch('send_message.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mentorId, message }),
+    });
+    const result = await response.json();
+    if (result.success) {
+      messageInput.value = ''; // Mesajı temizle
+      loadMessages(mentorId); // Mesajları yeniden yükle
+    } else {
+      alert('Mesaj gönderilirken bir hata oluştu.');
+    }
+  }
+}
+
+  </script>
+
   <script src="plugins/jQuery/jquery.min.js"></script>
 
   <script src="plugins/bootstrap/bootstrap.min.js"></script>

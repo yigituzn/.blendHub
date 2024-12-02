@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'];
     $content = $_POST['content'];
     $user_id = $_SESSION['user_id'];
-    $status = 'published';
+    $status = 'pending';
     $featured_image = null;
 
     }
