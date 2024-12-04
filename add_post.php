@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("issss", $user_id, $title, $content, $featured_image, $status);
 
     if ($stmt->execute()) {
-        echo "<script>alert('Gönderiniz başarıyla paylaşıldı!'); window.location.href = 'index.php';</script>";
+        echo "<script>alert('Gönderiniz incelenmek üzere gönderildi!'); window.location.href = 'index.php';</script>";
     } else {
         echo "Hata: " . $stmt->error;
     }

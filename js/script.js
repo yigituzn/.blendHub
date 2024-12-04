@@ -127,26 +127,6 @@ $(window).on('load', function () {
 
 })(jQuery);
 
-// Modal Açma ve Kapatma İşlevleri
-const mentorButton = document.getElementById('mentorButton');
-const mentorModal = document.getElementById('mentorModal');
-const closeModal = document.getElementById('closeModal');
-
-mentorButton.addEventListener('click', () => {
-	mentorModal.style.display = 'flex';
-});
-
-closeModal.addEventListener('click', () => {
-	mentorModal.style.display = 'none';
-});
-
-// Modalı tıklayınca kapatma
-window.addEventListener('click', (event) => {
-	if (event.target === mentorModal) {
-		mentorModal.style.display = 'none';
-	}
-});
-
 document.getElementById('addPostForm').addEventListener('submit', function(event) {
 	const fileInput = document.getElementById('featuredImage');
 	const file = fileInput.files[0];

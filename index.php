@@ -1,11 +1,6 @@
 <?php
 session_start();
-
-// Kullanıcı giriş yapmadıysa login sayfasına yönlendir
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
+include 'header.php';
 include 'db_connection.php';
 
 $sql = "SELECT username, slug, profile_picture FROM users ORDER BY created_at DESC LIMIT 3";
@@ -34,7 +29,7 @@ $conn->close();
 
   <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
   <link rel="icon" href="images/favicon.png" type="image/x-icon">
-  <link rel="stylesheet" href="../css/profilephoto.css">
+  <link rel="stylesheet" href="css/profilephoto.css">
   <style>
 /* Sohbet Widget */
 .chat-widget {
@@ -82,6 +77,13 @@ $conn->close();
   overflow-y: auto;
   max-height: 150px;
   max-height: calc(100% - 50px);
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-left: auto; /* Align to the right */
 }
 
 /* Mentör Listesi */
@@ -209,134 +211,11 @@ textarea {
   <div class="chat-toggle" onclick="toggleChat()">
   💬
   </div>
-<header class="navigation fixed-top">
-  <div class="container">
-    <nav class="navbar navbar-expand-lg navbar-white">
-      <a class="navbar-brand order-1" href="index.php">
-        <img class="img-fluid" width="100px" src="images/logo.png">
-      </a>
-      <div class="collapse navbar-collapse text-center order-lg-2 order-3" id="navigation">
-        <ul class="navbar-nav mx-auto">
-          <li class="nav-item dropdown">
-            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false">
-              anasayfa <i class="ti-angle-down ml-1"></i>
-            </a>
-            <div class="dropdown-menu">
-              <a class="dropdown-item" href="index-full.html">Homepage Full Width</a>
-              
-              <a class="dropdown-item" href="index-full-left.html">Homepage Full With Left Sidebar</a>
-              
-              <a class="dropdown-item" href="index-full-right.html">Homepage Full With Right Sidebar</a>
-              
-              <a class="dropdown-item" href="index-list.html">Homepage List Style</a>
-              
-              <a class="dropdown-item" href="index-list-left.html">Homepage List With Left Sidebar</a>
-              
-              <a class="dropdown-item" href="index-list-right.html">Homepage List With Right Sidebar</a>
-              
-              <a class="dropdown-item" href="index-grid.html">Homepage Grid Style</a>
-              
-              <a class="dropdown-item" href="index-grid-left.html">Homepage Grid With Left Sidebar</a>
-              
-              <a class="dropdown-item" href="index-grid-right.html">Homepage Grid With Right Sidebar</a>
-              
-            </div>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false">
-              yazılar <i class="ti-angle-down ml-1"></i>
-            </a>
-            <div class="dropdown-menu">
-              
-              <a class="dropdown-item" href="about-me.html">About Me</a>
-              
-              <a class="dropdown-item" href="about-us.html">About Us</a>
-              
-            </div>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link" href="contact.html">mentörler</a>
-          </li>
-
-          <li class="nav-item dropdown">
-            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false">hakkımızda <i class="ti-angle-down ml-1"></i>
-            </a>
-            <div class="dropdown-menu">
-              
-              <a class="dropdown-item" href="author.html">Author</a>
-              
-              <a class="dropdown-item" href="author-single.html">Author Single</a>
-
-              <a class="dropdown-item" href="advertise.html">Advertise</a>
-              
-              <a class="dropdown-item" href="post-details.html">Post Details</a>
-              
-              <a class="dropdown-item" href="post-elements.html">Post Elements</a>
-              
-              <a class="dropdown-item" href="tags.html">Tags</a>
-
-              <a class="dropdown-item" href="search-result.html">Search Result</a>
-
-              <a class="dropdown-item" href="search-not-found.html">Search Not Found</a>
-              
-              <a class="dropdown-item" href="privacy-policy.html">Privacy Policy</a>
-              
-              <a class="dropdown-item" href="terms-conditions.html">Terms Conditions</a>
-
-              <a class="dropdown-item" href="404.html">404 Page</a>
-              
-            </div>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link" href="shop.html">Yardım</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="shop.html">İletişim</a>
-          </li>
-        </ul>
-      </div>
-
-      <div class="order-2 order-lg-3 d-flex align-items-center">
-        
-        <form class="search-bar">
-          <input id="search-query" name="s" type="search" placeholder="Type &amp; Hit Enter...">
-        </form>
-        
-        <button class="navbar-toggler border-0 order-1" type="button" data-toggle="collapse" data-target="#navigation">
-          <i class="ti-menu"></i>
-        </button>
-        <div class="dropdown" style="margin-left: 25px;">
-            <a href="#" class="dropdown-toggle" id="profileDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <?php if (!empty($_SESSION['profile_picture'])): ?>
-              <img src="data:image/jpeg;base64,<?php echo htmlspecialchars($_SESSION['profile_picture']); ?>" alt="Profil Fotoğrafı" width="40" height="40" class="rounded-circle">
-            <?php else: ?>
-              <img src="images/dprofile.jpg" alt="Varsayılan Profil Fotoğrafı" width="40" height="40" class="rounded-circle">
-            <?php endif; ?>
-            </a>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
-            <a class="dropdown-item" href="profile.php?slug=<?php echo $_SESSION['slug']; ?>">Profilim</a>
-              <a class="dropdown-item" href="settings.php">Ayarlar</a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="logout.php" onclick="return confirm('Çıkış yapmak istediğinize emin misiniz?');">Çıkış Yap</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </nav>
-  </div>
-</header>
-
 <div class="banner text-center">
   <div class="container">
     <div class="row">
       <div class="col-lg-9 mx-auto">
-        <h1 class="mb-5">Esmanur <br> Like To Read Today?</h1>
+        <h1 class="mb-5">Would You <br> Like To Read Today?</h1>
         <ul class="list-inline widget-list-inline">
           <li class="list-inline-item"><a href="tags.html">City</a></li>
           <li class="list-inline-item"><a href="tags.html">Color</a></li>
@@ -546,21 +425,10 @@ textarea {
       <div class="col-lg-8  mb-5 mb-lg-0">
   <h2 class="h5 section-title">Recent Post</h2>
   <?php
-// Veritabanı bağlantısını yapın
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "blendhub";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Bağlantıyı kontrol edin
-if ($conn->connect_error) {
-    die("Bağlantı hatası: " . $conn->connect_error);
-}
+include 'db_connection.php';
 
 // Veritabanından son 5 blog gönderisini çekin
-$query = "SELECT posts.*, users.username, users.profile_picture FROM posts 
+$query = "SELECT posts.*, users.username, users.slug, users.profile_picture FROM posts 
           INNER JOIN users ON posts.user_id = users.user_id 
           WHERE posts.status = 'published' 
           ORDER BY posts.created_at DESC 
@@ -589,6 +457,7 @@ while ($row = $result->fetch_assoc()) :
     $content = $row['content'];
     $reading_time = calculateReadingTime($content);
     $post_id = $row['post_id'];
+
 ?>
 <article class="card mb-4">
     <div class="post-slider">
@@ -605,8 +474,8 @@ while ($row = $result->fetch_assoc()) :
         </h3>
         <ul class="card-meta list-inline">
             <li class="list-inline-item">
-                <a href="profile.php?slug=<?php echo $row['username']; ?>" class="card-meta-author">
-                    <img src="<?php echo !empty($row['profile_picture']) ? 'uploads/' . $row['profile_picture'] : 'images/dprofile.jpg'; ?>" alt="<?php echo htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8'); ?>">
+                <a href="profile.php?slug=<?php echo $row['slug']; ?>" class="card-meta-author">
+                    <img src="<?php echo !empty($row['profile_picture']) ? 'data:image/png;base64,' . $row['profile_picture'] : 'images/dprofile.jpg'; ?>" alt="<?php echo htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8'); ?>">
                     <span><?php echo htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8'); ?></span>
                 </a>
             </li>
@@ -883,6 +752,9 @@ while ($row = $result->fetch_assoc()) :
             <input type="file" class="form-control-file" id="featuredImage" name="featured_image" accept=".jpg,.jpeg,.png">
             <small class="form-text text-muted">Sadece JPG ve PNG formatında, maksimum 5MB.</small>
           </div>
+          <p id="blog-login-warning" style="color: red; display: none;">
+            Blog ekleyebilmek için <a href="login.php">giriş yapınız.</a>
+          </p>
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">Paylaş</button>
@@ -893,13 +765,13 @@ while ($row = $result->fetch_assoc()) :
   </div>
 </div>
 
-      <!-- Mentör Ol Button -->
+      <!-- Mentör Ol Button 
 <div class="widget">
     <h4 class="widget-title"><span>Sen de mentörlerimiz arasına katılmak ister misin?</span></h4>
-      <button type="submit" id="mentorButton" class="btn btn-primary btn-block" name="subscribe" data-toggle="modal" data-target="#mentorModal">Mentör Ol</button>
+      <button type="submit" id="mentorButton" class="btn btn-primary btn-block" name="mentorapplication" data-toggle="modal" data-target="#mentorModal">Mentör Ol</button>
   </div>
 
-<!-- Mentör Ol Modal -->
+ Mentör Ol Modal 
 <div id="mentorModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;">
     <div class="modal-content" style="background: #fff; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px;">
         <h3>Mentörlük Başvuru Formu</h3>
@@ -916,11 +788,51 @@ while ($row = $result->fetch_assoc()) :
                 <label for="expertise">Uzmanlık Alanı</label>
                 <input type="text" id="expertise" name="expertise" class="form-control" required>
             </div>
+            <p id="mentor-login-warning" style="color: red; display: none;">
+                Mentörlük başvurusu yapabilmek için <a href="login.php">giriş yapınız.</a>
+            </p>
             <button type="submit" class="btn btn-success">Başvur</button>
             <button type="button" id="closeModal" class="btn btn-secondary">İptal</button>
         </form>
     </div>
-</div>  
+</div>  -->
+<div class="widget">
+  <h4 class="widget-title"><span>Sen de mentörlerimiz arasına katılmak ister misin?</span></h4>
+    <button type="submit" id="mentorButton" class="btn btn-primary btn-block" name="mentorApplication" data-toggle="modal" data-target="#mentorModal">Başvur</button>
+</div>
+<div id="mentorModal" class="modal" style="border: 10px" tabindex="-1" role="dialog" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">
+  <div class="modal-dialog modal-dialog-centered" role="document" style="border-radius: 8px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Mentörlük Başvuru Formu</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="mentorForm" method="POST" action="mentor_application.php" enctype="multipart/form-data">
+      <div class="modal-body">
+          <div class="form-group">
+            <label for="postTitle">Ad Soyad</label>
+            <input type="text" class="form-control" id="postTitle" name="title" required>
+          </div>
+          <div class="form-group">
+            <label for="postContent">E-posta</label>
+            <input type="email" id="email" name="email" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="expertise">Uzmanlık Alanı</label>
+                <input type="text" id="expertise" name="expertise" class="form-control" required>
+            </div>
+            <p id="mentor-login-warning" style="color: red; display: none;">
+                Mentörlük başvurusu yapabilmek için <a href="login.php">giriş yapınız.</a>
+            </p>
+            <button type="submit" class="btn btn-primary">Başvur</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+      </form>
+    </div>
+  </div>
+</div>
+                    </div>
   <div class="widget">
     <h4 class="widget-title"><span>Search</span></h4>
     <form action="#!" class="widget-search">
@@ -1160,34 +1072,37 @@ async function updateChatHeader() {
     : 'Mentörler ile Canlı Sohbet';
 }
 
+// Sohbet widget'ı ve listeyi yükle
 document.addEventListener('DOMContentLoaded', () => {
   updateChatHeader(); // Başlığı güncelle
   loadChatList(); // Sohbet listesi yüklensin
 });
+
+let chatInterval;
 
 async function loadChatList() {
   const response = await fetch('get_chat_list.php');
   const chatList = await response.json();
   const mentorList = document.getElementById('mentor-list');
   mentorList.innerHTML = '';
+
   chatList.forEach(person => {
     const div = document.createElement('div');
     div.className = 'mentor-item';
-    div.innerHTML = person.profile_picture 
-                    ? `<img src="data:image/jpeg;base64,${person.profile_picture}" alt="${person.username}">`
-                    : `<img src="images/dprofile.jpg" alt="Default Profile Picture">`;
+    div.innerHTML = person.profile_picture
+      ? `<img src="data:image/jpeg;base64,${person.profile_picture}" alt="${person.username}">`
+      : `<img src="images/dprofile.jpg" alt="Default Profile Picture">`;
+
     div.innerHTML += `<span>${person.username}</span>`;
+    div.innerHTML += `<div class="status-indicator" style="background-color: ${
+  (person.is_online == 1) ? 'green' : 'gray'
+};"></div>`;
     div.onclick = () => openChat(person.user_id, person.username);
     mentorList.appendChild(div);
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  loadChatList(); // Sohbet listesi yüklensin
-});
-
-let chatInterval;
-
+// Sohbet widget'ını aç/kapa
 function toggleChat() {
   const chatWidget = document.querySelector('.chat-widget');
   const chatToggle = document.querySelector('.chat-toggle');
@@ -1213,7 +1128,8 @@ function toggleChat() {
   }
 }
 
-function openChat(mentorId, mentorName) {
+// Sohbet ekranını aç ve mesajları yükle
+async function openChat(mentorId, mentorName) {
   const chatBox = document.getElementById('chat-box');
   const messagesDiv = document.getElementById('messages');
   const mentorList = document.getElementById('mentor-list');
@@ -1224,19 +1140,20 @@ function openChat(mentorId, mentorName) {
   chatBox.classList.add('active'); // Sohbet ekranını görünür yap
   backBtn.style.display = 'inline-block'; // Geri butonunu göster
   messagesDiv.innerHTML = `<h3>${mentorName} ile sohbet</h3>`; // Başlığı güncelle
-  loadMessages(mentorId); // Mesajları yükle
 
-  // Daha önceki interval varsa temizle
-  if (chatInterval) {
-    clearInterval(chatInterval);
-  }
+  await loadMessages(mentorId); // Mesajları yükle
 
   // Mesajları otomatik yenile
+  if (chatInterval) {
+    clearInterval(chatInterval); // Daha önceki interval varsa temizle
+  }
   chatInterval = setInterval(() => {
     loadMessages(mentorId);
   }, 2000);
+
 }
 
+// Sohbet listesini geri yükle
 function goBackToList() {
   const chatBox = document.getElementById('chat-box');
   const mentorList = document.getElementById('mentor-list');
@@ -1251,6 +1168,7 @@ function goBackToList() {
   }
 }
 
+// Sohbet ekranını kapat
 function closeChat() {
   const chatBox = document.getElementById('chat-box');
   const mentorList = document.getElementById('mentor-list');
@@ -1261,24 +1179,33 @@ function closeChat() {
   }
 }
 
+// Mesajları yükle
 async function loadMessages(mentorId) {
   const response = await fetch(`get_messages.php?mentorId=${mentorId}`);
   const messages = await response.json();
   const messagesDiv = document.getElementById('messages');
   messagesDiv.innerHTML = ''; // Önceki mesajları temizle
-  messages.forEach(message => {
+
+  // Son mesajı bulmak için toplam mesaj sayısını kontrol edin
+  const totalMessages = messages.length;
+
+  messages.forEach((message, index) => {
     const isCurrentUser = message.is_current_user;
     const div = document.createElement('div');
-    div.className = message.is_current_user == 1 ? 'message-right' : 'message-left';
-    if (isCurrentUser === '1') {
+    div.className = isCurrentUser == 1 ? 'message-right' : 'message-left';
+
+    // Mesaj içeriğini ekle
+    if (isCurrentUser == 1) {
       div.innerHTML = `<span>${message.message}</span>`;
     } else {
       div.innerHTML = `<strong>${message.sender_name}:</strong> <span>${message.message}</span>`;
     }
-   messagesDiv.appendChild(div);
+
+    messagesDiv.appendChild(div);
   });
 }
 
+// Mesaj gönderme
 async function sendMessage() {
   const mentorId = document.getElementById('chat-box').dataset.mentorId;
   const messageInput = document.getElementById('message-input');
@@ -1299,6 +1226,41 @@ async function sendMessage() {
   }
 }
 
+// Giriş durumu kontrolü
+async function checkLoginStatus() {
+  const response = await fetch('is_logged_in.php');
+  const data = await response.json();
+
+  // Blog Ekleme Formu
+  const blogForm = document.getElementById('blog-form');
+  const blogWarning = document.getElementById('blog-login-warning');
+  const blogSubmit = document.getElementById('submit-blog');
+
+  // Mentörlük Başvuru Formu
+  const mentorForm = document.getElementById('mentor-form');
+  const mentorWarning = document.getElementById('mentor-login-warning');
+  const mentorSubmit = document.getElementById('submit-mentor');
+
+  if (data.logged_in) {
+    // Kullanıcı giriş yapmışsa butonları aktif et
+    if (blogForm) blogSubmit.disabled = false;
+    if (blogWarning) blogWarning.style.display = 'none';
+
+    if (mentorForm) mentorSubmit.disabled = false;
+    if (mentorWarning) mentorWarning.style.display = 'none';
+  } else {
+    // Kullanıcı giriş yapmamışsa uyarı göster
+    if (blogForm) blogSubmit.disabled = true;
+    if (blogWarning) blogWarning.style.display = 'block';
+
+    if (mentorForm) mentorSubmit.disabled = true;
+    if (mentorWarning) mentorWarning.style.display = 'block';
+  }
+}
+
+setInterval(async () => {
+  await fetch('update_activity.php', { method: 'POST' });
+}, 120000);
   </script>
 
   <script src="plugins/jQuery/jquery.min.js"></script>

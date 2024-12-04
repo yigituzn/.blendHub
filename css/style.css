@@ -1468,4 +1468,11 @@ mark {
 .shadow-none {
   box-shadow: none !important;
 }
+
+.message-status {
+  display: block;
+  font-size: 12px; /* Daha küçük yazı boyutu */
+  color: blue; /* Mavi renkte */
+  margin-top: 5px;
+}
 /*# sourceMappingURL=style.css.map */

@@ -1,16 +1,8 @@
 <?php
 session_start();
 
-// Veritabanı bağlantısı
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "blendhub";
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Bağlantı hatası: " . $conn->connect_error);
-}
+//include 'header.php';
+include 'db_connection.php';
 
 // Slug bilgisi URL'den alınır
 $slug = $_GET['slug'] ?? null;
