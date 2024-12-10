@@ -811,13 +811,13 @@ while ($row = $result->fetch_assoc()) :
       </div>
       <form id="mentorForm" method="POST" action="mentor_application.php" enctype="multipart/form-data">
       <div class="modal-body">
-          <div class="form-group">
-            <label for="postTitle">Ad Soyad</label>
-            <input type="text" class="form-control" id="postTitle" name="title" required>
-          </div>
-          <div class="form-group">
-            <label for="postContent">E-posta</label>
-            <input type="email" id="email" name="email" class="form-control" required>
+      <div class="form-group">
+                <label for="fullName">Ad Soyad</label>
+                <input type="text" id="fullName" name="fullName" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="email">E-posta</label>
+                <input type="email" id="email" name="email" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="expertise">Uzmanlık Alanı</label>
@@ -827,7 +827,7 @@ while ($row = $result->fetch_assoc()) :
                 Mentörlük başvurusu yapabilmek için <a href="login.php">giriş yapınız.</a>
             </p>
             <button type="submit" class="btn btn-primary">Başvur</button>
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+            <button type="button" id="closeModal" class="btn btn-secondary">İptal</button>
       </form>
     </div>
   </div>
@@ -1260,7 +1260,7 @@ async function checkLoginStatus() {
 
 setInterval(async () => {
   await fetch('update_activity.php', { method: 'POST' });
-}, 120000);
+}, 12000);
   </script>
 
   <script src="plugins/jQuery/jquery.min.js"></script>
