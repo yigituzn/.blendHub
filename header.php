@@ -2,7 +2,8 @@
   <div class="container">
     <nav class="navbar navbar-expand-lg navbar-white">
       <a class="navbar-brand order-1" href="index.php">
-        <img class="img-fluid" width="100px" src="images/logo.png">
+        <img class="img-fluid" width="100px" src="images/logo.png"
+          alt=".blendHub">
       </a>
       <div class="collapse navbar-collapse text-center order-lg-2 order-3" id="navigation">
         <ul class="navbar-nav mx-auto">
@@ -82,18 +83,18 @@
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="shop.html">Yardım</a>
+            <a class="nav-link" href="shop.html">yardım</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="shop.html">İletişim</a>
+            <a class="nav-link" href="shop.html">iletişim</a>
           </li>
         </ul>
       </div>
 
       <div class="order-2 order-lg-3 d-flex align-items-center">
         
-        <form class="search-bar">
-          <input id="search-query" name="s" type="search" style="margin-top: 20px;" placeholder="Type &amp; Hit Enter...">
+        <form class="search-bar" style="margin-top: 15px">
+          <input id="search-query" name="s" type="search" placeholder="Type &amp; Hit Enter...">
         </form>
         
         <button class="navbar-toggler border-0 order-1" type="button" data-toggle="collapse" data-target="#navigation">

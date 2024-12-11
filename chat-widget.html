@@ -1,0 +1,19 @@
+<div class="chat-widget">
+    <div class="chat-header">
+      <button id="back-btn" onclick="goBackToList()" style="display: none;">&larr;</button>
+      <span id="chat-header-title">Mentörler ile Canlı Sohbet</span>
+      <button id="close-btn" onclick="toggleChat()">&times;</button>
+    </div>
+      <div class="chat-content">
+        <div class="mentor-list" id="mentor-list"></div>
+        <div class="chat-box" id="chat-box">
+          <div class="messages" id="messages"></div>
+          <textarea id="message-input" placeholder="Mesajınızı yazın..."></textarea>
+          <button id="send-btn" onclick="sendMessage()">Gönder</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="chat-toggle" onclick="toggleChat()">
+    💬
+    </div>

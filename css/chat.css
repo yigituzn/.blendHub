@@ -1,0 +1,157 @@
+.chat-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 350px;
+  height: 500px; /* Sabit yükseklik */
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+  z-index: 9999;
+}
+
+.chat-header {
+  background: #21ad26;
+  color: white;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-header button {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Sohbet İçeriği */
+.chat-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.mentor-list {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  overflow-y: auto;
+  max-height: 150px;
+  max-height: calc(100% - 50px);
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-left: auto; /* Align to the right */
+}
+
+/* Mentör Listesi */
+.mentor-item {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.mentor-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.mentor-list.hidden {
+  display: none; /* Mentör listesi gizlemek için */
+}
+
+.chat-box {
+  display: none; /* Başlangıçta gizli */
+  flex-grow: 1;
+  flex-direction: column;
+  max-height: calc(100% - 50px);
+  overflow-y: auto;
+}
+
+.chat-box.active {
+  display: flex; /* Mentöre tıklandığında görünür */
+}
+
+.messages {
+  flex-grow: 1;
+  padding: 10px;
+  overflow-y: auto;
+  border-top: 1px solid #ccc;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-top: 1px solid #ccc;
+  resize: none;
+}
+
+#send-btn {
+  background: #21ad26;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.chat-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background: #21ad26;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10000;
+}
+#back-btn {
+  font-size: 16px;
+  margin-right: 10px;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: none; /* Başlangıçta gizli */
+}
+
+/* Sohbet ekranı aktifken geri butonu görünsün */
+.chat-box.active #back-btn {
+  display: inline-block;
+}
+.messages {
+  padding: 10px;
+  overflow-y: auto; /* Kaydırılabilir içerik */
+  max-height: 400px; /* Sabit yüksekliği koru */
+}
+
+/* Soldaki mesajlar (karşı tarafın mesajları) */
+.message-left {
+  text-align: left; /* Yazıyı sola hizala */
+  color: #000; /* Siyah yazı */
+  margin: 5px 0;
+  padding: 5px;
+}
+
+/* Sağdaki mesajlar (kullanıcının mesajları) */
+.message-right {
+  text-align: right; /* Yazıyı sağa hizala */
+  color: #007bff; /* Mavi yazı */
+  margin: 5px 0;
+  padding: 5px;
+}

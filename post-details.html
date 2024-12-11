@@ -1,47 +1,122 @@
-  <!DOCTYPE html>
+<?php
+session_start();
+//include 'header.php';
+include 'db_connection.php';
 
-<!--
- // WEBSITE: https://themefisher.com
- // TWITTER: https://twitter.com/themefisher
- // FACEBOOK: https://www.facebook.com/themefisher
- // GITHUB: https://github.com/themefisher/
--->
+// Gelen post_id parametresini alın
+$post_id = $_GET['post_id'] ?? null;
+if (!$post_id) {
+    die(header("Location: 404.html"));
+}
 
-<html lang="en-us"><head>
+// Post bilgilerini alın
+$post_query = "SELECT posts.*, users.username, users.profile_picture 
+               FROM posts 
+               INNER JOIN users ON posts.user_id = users.user_id 
+               WHERE posts.post_id = ?";
+$stmt = $conn->prepare($post_query);
+$stmt->bind_param("i", $post_id);
+$stmt->execute();
+$post_result = $stmt->get_result();
+
+if ($post_result->num_rows === 0) {
+    die(header("Location: 404.html"));
+}
+
+$post = $post_result->fetch_assoc();
+
+// Kategorileri çek
+$category_query = "SELECT categories.name FROM postcategories 
+                   JOIN categories ON postcategories.category_id = categories.category_id 
+                   WHERE postcategories.post_id = ?";
+$category_stmt = $conn->prepare($category_query);
+$category_stmt->bind_param("i", $post_id);
+$category_stmt->execute();
+$category_result = $category_stmt->get_result();
+$categories = [];
+while ($category = $category_result->fetch_assoc()) {
+    $categories[] = $category['name'];
+}
+
+// Okuma süresini hesapla
+function calculateReadingTime($content, $words_per_minute = 200) {
+    $word_count = str_word_count(strip_tags($content));
+    return max(ceil($word_count / $words_per_minute), 1);
+}
+$reading_time = calculateReadingTime($post['content']);
+
+// Yorumları ve cevapları al
+$comment_query = "SELECT comments.*, users.username, users.slug, users.profile_picture 
+                   FROM comments 
+                   INNER JOIN users ON comments.user_id = users.user_id 
+                   WHERE comments.post_id = ? AND comments.status = 'approved'
+                   ORDER BY comments.created_at ASC";
+$comment_stmt = $conn->prepare($comment_query);
+$comment_stmt->bind_param("i", $post_id);
+$comment_stmt->execute();
+$comment_result = $comment_stmt->get_result();
+$comments = [];
+while ($row = $comment_result->fetch_assoc()) {
+    $comments[$row['parent_comment_id']][] = $row;
+}
+
+// Yorum ve cevap ekleme
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $comment = trim($_POST['comment'] ?? '');
+    $parent_id = $_POST['parent_id'] ?? null;
+    $user_id = $_SESSION['user_id'] ?? null;
+
+    if ($user_id && !empty($comment)) {
+        $insert_comment_query = "INSERT INTO comments (post_id, user_id, content, parent_comment_id, status) 
+                                 VALUES (?, ?, ?, ?, 'pending')";
+        $insert_stmt = $conn->prepare($insert_comment_query);
+        $insert_stmt->bind_param("iisi", $post_id, $user_id, $comment, $parent_id);
+        $insert_stmt->execute();
+        $insert_stmt->close();
+        echo "<script>alert('Yorumunuz incelenmek üzere gönderildi.'); window.location.href = 'post-details.php?post_id=$post_id';</script>";
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="tr-TR"><head>
   <meta charset="utf-8">
-  <title>Reader | Hugo Personal Blog Template</title>
+  <title>.blendHub | <?php echo htmlspecialchars($post['title']); ?></title>
 
-  <!-- mobile responsive meta -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="This is meta description">
-  <meta name="author" content="Themefisher">
-  <meta name="generator" content="Hugo 0.74.3" />
 
-  <!-- plugins -->
-  
   <link rel="stylesheet" href="plugins/bootstrap/bootstrap.min.css">
   <link rel="stylesheet" href="plugins/themify-icons/themify-icons.css">
   <link rel="stylesheet" href="plugins/slick/slick.css">
 
-  <!-- Main Stylesheet -->
   <link rel="stylesheet" href="css/style.css" media="screen">
 
-  <!--Favicon-->
   <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
   <link rel="icon" href="images/favicon.png" type="image/x-icon">
-
-  <meta property="og:title" content="Reader | Hugo Personal Blog Template" />
-  <meta property="og:description" content="This is meta description" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="" />
-  <meta property="og:updated_time" content="2020-03-15T15:40:24+06:00" />
+
+<style>
+.d-none {
+  display: none; /* Görünmez yapar */
+}
+.reply-btn {
+    color: #007bff; /* Yanıtla butonunun rengini belirler */
+    cursor: pointer; /* El işareti */
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 14px;
+    text-decoration: underline; /* Alt çizgi */
+}
+.media .media {
+  margin-top: 20px; /* Alt yorumlar için üst boşluk */
+}
+</style>
 </head>
 <body>
-  <!-- navigation -->
 <header class="navigation fixed-top">
   <div class="container">
     <nav class="navbar navbar-expand-lg navbar-white">
-      <a class="navbar-brand order-1" href="index.html">
+      <a class="navbar-brand order-1" href="index.php">
         <img class="img-fluid" width="100px" src="images/logo.png"
           alt="Reader | Hugo Personal Blog Template">
       </a>
@@ -142,6 +217,26 @@
         <button class="navbar-toggler border-0 order-1" type="button" data-toggle="collapse" data-target="#navigation">
           <i class="ti-menu"></i>
         </button>
+          <?php if (isset($_SESSION['user_id'])): ?>
+        <div class="dropdown" style="margin-left: 25px;">
+            <a href="profile.php?slug=<?php echo $_SESSION['slug']; ?>" class="dropdown-toggle" id="profileDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <?php if (!empty($_SESSION['profile_picture'])): ?>
+                    <img src="data:image/jpeg;base64,<?php echo htmlspecialchars($_SESSION['profile_picture']); ?>" alt="Profil Fotoğrafı" width="40" height="40" class="rounded-circle">
+                <?php else: ?>
+                    <img src="images/dprofile.jpg" alt="Varsayılan Profil Fotoğrafı" width="40" height="40" class="rounded-circle">
+                <?php endif; ?>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
+                <a class="dropdown-item" href="profile.php?slug=<?php echo $_SESSION['slug']; ?>">Profilim</a>
+                <a class="dropdown-item" href="settings.php">Ayarlar</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="logout.php" onclick="return confirm('Çıkış yapmak istediğinize emin misiniz?');">Çıkış Yap</a>
+            </div>
+        </div>
+    <?php else: ?>
+        <a href="login.php" style="margin-left: 25px; color: green">Giriş Yap</a>
+    <?php endif; ?>
+        </div>
       </div>
 
     </nav>
@@ -156,40 +251,37 @@
       <div class=" col-lg-9   mb-5 mb-lg-0">
         <article>
           <div class="post-slider mb-4">
-            <img src="images/post/post-2.jpg" class="card-img" alt="post-thumb">
+            <img src=""<?php echo $post['featured_image'] ? 'data:image/jpeg;base64,' . $post['featured_image'] : 'images/default_post.jpg'; ?>" class="card-img" alt="<?php echo htmlspecialchars($post['title']); ?>">
           </div>
           
-          <h1 class="h2">Customer Engage Marketing Marketing Strategy to Economy Structure Everyone. </h1>
+          <h1 class="h2"><?php echo htmlspecialchars($post['title']); ?></h1>
           <ul class="card-meta my-3 list-inline">
             <li class="list-inline-item">
-              <a href="author-single.html" class="card-meta-author">
-                <img src="images/john-doe.jpg">
-                <span>Charls Xaviar</span>
+              <a href="profile.php?slug=<?php echo urlencode($post['username']); ?>" class="card-meta-author">
+                <img src="<?php echo $post['profile_picture'] ? 'data:image/jpeg;base64,' . $post['profile_picture'] : 'images/dprofile.jpg'; ?>" alt="<?php echo htmlspecialchars($post['username']); ?>">
+                <span><?php echo htmlspecialchars($post['username']); ?></span>
               </a>
             </li>
             <li class="list-inline-item">
-              <i class="ti-timer"></i>2 Min To Read
+              <i class="ti-timer"></i><?php echo $reading_time; ?> dakikada okuyabilirsiniz
             </li>
             <li class="list-inline-item">
-              <i class="ti-calendar"></i>14 jan, 2020
+              <i class="ti-calendar"></i>
+              <?php
+                $formatter = new IntlDateFormatter('tr_TR', IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+                echo $formatter->format(new DateTime($post['created_at']));
+              ?>
             </li>
             <li class="list-inline-item">
               <ul class="card-meta-tag list-inline">
-                <li class="list-inline-item"><a href="tags.html">Color</a></li>
-                <li class="list-inline-item"><a href="tags.html">Recipe</a></li>
-                <li class="list-inline-item"><a href="tags.html">Fish</a></li>
+                <?php foreach ($categories as $category) : ?>
+                  <li class="list-inline-item"><a href="categories.php?category=<?php echo urlencode($category); ?>"><?php echo htmlspecialchars($category); ?></a></li>
+                <?php endforeach; ?>
               </ul>
             </li>
           </ul>
-          <div class="content"><p>It’s no secret that the digital industry is booming. From exciting startups to global brands, companies are reaching out to digital agencies, responding to the new possibilities available. However, the industry is fast becoming overcrowded, heaving with agencies offering similar services — on the surface, at least. Producing creative, fresh projects is the key to standing out. Unique side projects are the best place to innovate, but balancing commercially and creatively lucrative work is tricky. So, this article looks at</p>
-          <p>It’s no secret that the digital industry is booming. From exciting startups to global brands, companies
-          are reaching out to digital agencies, responding to the new possibilities available. However, the industryis fast becoming overcrowded, heaving with agencies offering similar services — on the surface, at least.Producing creative, fresh projects is the key to standing out. Unique side projects are the best place toinnovate, but balancing commercially and creatively lucrative work is tricky. So, this article looks at</p>
-          <p>It’s no secret that the digital industry is booming. From exciting startups to global brands, companies
-          are reaching out to digital agencies, responding to the new possibilities available. However, the industryis fast becoming overcrowded, heaving with agencies offering similar services — on the surface, at least.
-          Producing creative, fresh projects is the key to standing out. Unique side projects are the best place toinnovate, but balancing commercially and creatively lucrative work is tricky. So, this article looks at</p>
-          <p>It’s no secret that the digital industry is booming. From exciting startups to global brands, companies
-          are reaching out to digital agencies, responding to the new possibilities available. However, the industryis fast becoming overcrowded, heaving with agencies offering similar services — on the surface, at least.
-          Producing creative, fresh projects is the key to standing out. Unique side projects are the best place toinnovate, but balancing commercially and creatively lucrative work is tricky. So, this article looks at</p>
+          <div class="content">
+            <p><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
           </div>
         </article>
         
@@ -197,56 +289,57 @@
 
       <div class="col-lg-9 col-md-12">
           <div class="mb-5 border-top mt-4 pt-5">
-              <h3 class="mb-4">Comments</h3>
-
+              <h3 class="mb-4">Yorumlar</h3>
+              <?php
+              function renderComments($comments, $parent_id = null) {   
+                if (isset($comments[$parent_id])) {
+                  foreach ($comments[$parent_id] as $comment) {
+                ?>
               <div class="media d-block d-sm-flex mb-4 pb-4">
-                  <a class="d-inline-block mr-2 mb-3 mb-md-0" href="#">
-                      <img src="images/post/user-01.jpg" class="mr-3 rounded-circle" alt="">
+                <?php if ($comment['parent_comment_id']) : ?>
+                    <img class="mr-3" src="images/post/arrow.png">
+                <?php endif; ?>
+                <a class="d-inline-block mr-2 mb-3 mb-md-0" href="profile.php?slug=<?php echo urlencode($comment['slug']); ?>">
+                  <img src="<?php echo $comment['profile_picture'] ? 'data:image/jpeg;base64,' . $comment['profile_picture'] : 'images/dprofile.jpg'; ?>" class="mr-3 rounded-circle">    
                   </a>
                   <div class="media-body">
-                      <a href="#!" class="h4 d-inline-block mb-3">Alexender Grahambel</a>
+                    <a href="profile.php?slug=<?php echo urlencode($comment['slug']); ?>" class="h4 d-inline-block mb-3">
+                      <?php echo htmlspecialchars($comment['username']); ?>
+                    </a>
 
-                      <p>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</p>
+                    <p><?php echo htmlspecialchars($comment['content']); ?></p>
                       
-                      <span class="text-black-800 mr-3 font-weight-600">April 18, 2020 at 6.25 pm</span>
-                      <a class="text-primary font-weight-600" href="#!">Reply</a>
-                  </div>
+                    <span class="text-black-800 mr-3 font-weight-600"><?php
+                      $formatter = new IntlDateFormatter('tr_TR', IntlDateFormatter::LONG, IntlDateFormatter::SHORT);
+                      echo $formatter->format(new DateTime($comment['created_at']));
+                      ?></span>
+                      <form method="POST">
+                        <button class="text-primary font-weight-600 reply-btn" type="submit" style="text-decoration: none; "data-comment-id="<?php echo $comment['comment_id']; ?>">Yanıtla</button>
+                        <div id="reply-form-<?php echo $comment['comment_id']; ?>" class="reply-form d-none">
+                            <input type="hidden" name="parent_id" value="<?php echo $comment['comment_id']; ?>">
+                            <textarea  class="form-control shadow-none" style="margin-top: 10px; margin-bottom: 20px;" name="comment" rows="2" required></textarea>
+                        </form>
+                      </div>
+                      <?php renderComments($comments, $comment['comment_id']); ?>
+                    </div>
+                    // Bir div fazla olabilir!
               </div>
-              <div class="media d-block d-sm-flex">
-                  <div class="d-inline-block mr-2 mb-3 mb-md-0" href="#">
-                      <img class="mr-3" src="images/post/arrow.png" alt="">
-                      <a href="#!"><img src="images/post/user-02.jpg" class="mr-3 rounded-circle" alt=""></a>
-                  </div>
-                  <div class="media-body">
-                      <a href="#!" class="h4 d-inline-block mb-3">Nadia Sultana Tisa</a>
-
-                      <p>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</p>
-
-                      <span class="text-black-800 mr-3 font-weight-600">April 18, 2020 at 6.25 pm</span>
-                      <a class="text-primary font-weight-600" href="#!">Reply</a>
-                  </div>
-              </div>
+              <?php
+                  }
+                }
+              }
+              renderComments($comments);
+              ?>
           </div>
-
           <div>
-              <h3 class="mb-4">Leave a Reply</h3>
+              <h3 class="mb-4">Yorum Yap</h3>
               <form method="POST">
                   <div class="row">
                       <div class="form-group col-md-12">
                           <textarea class="form-control shadow-none" name="comment" rows="7" required></textarea>
                       </div>
-                      <div class="form-group col-md-4">
-                          <input class="form-control shadow-none" type="text" placeholder="Name" required>
-                      </div>
-                      <div class="form-group col-md-4">
-                          <input class="form-control shadow-none" type="email" placeholder="Email" required>
-                      </div>
-                      <div class="form-group col-md-4">
-                          <input class="form-control shadow-none" type="url" placeholder="Website">
-                          <p class="font-weight-bold valid-feedback">OK! You can skip this field.</p>
-                      </div>
                   </div>
-                  <button class="btn btn-primary" type="submit">Comment Now</button>
+                  <button class="btn btn-primary" type="submit">Paylaş</button>
               </form>
           </div>
       </div>
@@ -311,6 +404,48 @@
   </div>
   </footer>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const replyButtons = document.querySelectorAll('.reply-btn');
+        if (replyButtons.length === 0) {
+            console.error('Yanıtla butonları bulunamadı.');
+        } else {
+            console.log(`${replyButtons.length} adet Yanıtla butonu bulundu.`);
+        }
+    
+        replyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = this.getAttribute('data-comment-id');
+                const replyForm = document.getElementById(`reply-form-${commentId}`);
+                if (replyForm) {
+                    replyForm.classList.remove('d-none'); // Formu görünür yap
+                } else {
+                    console.error(`reply-form-${commentId} bulunamadı.`);
+                }
+            });
+        });
+    });
+    async function checkLoginStatus() {
+      const response = await fetch('is_logged_in.php');
+      const data = await response.json();
+    
+      const submitButton = document.getElementById('submit-comment');
+      const loginWarning = document.getElementById('login-warning');
+    
+      if (data.logged_in) {
+        // Kullanıcı giriş yapmış, buton aktif
+        submitButton.disabled = false;
+        loginWarning.style.display = 'none';
+      } else {
+        // Kullanıcı giriş yapmamış, buton devre dışı
+        submitButton.disabled = true;
+        loginWarning.style.display = 'block';
+      }
+    }
+    
+    // Sayfa yüklendiğinde giriş durumu kontrol ediliyor
+    document.addEventListener('DOMContentLoaded', checkLoginStatus);
+    </script>
 
   <!-- JS Plugins -->
   <script src="plugins/jQuery/jquery.min.js"></script>

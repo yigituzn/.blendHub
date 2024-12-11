@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'header.php';
+//include 'header.php';
 include 'db_connection.php';
 
 $sql = "SELECT username, slug, profile_picture FROM users ORDER BY created_at DESC LIMIT 3";
@@ -26,191 +26,144 @@ $conn->close();
   <link rel="stylesheet" href="plugins/slick/slick.css">
 
   <link rel="stylesheet" href="css/style.css" media="screen">
+  <link rel="stylesheet" href="css/chat.css" media="screen">
 
   <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
   <link rel="icon" href="images/favicon.png" type="image/x-icon">
   <link rel="stylesheet" href="css/profilephoto.css">
   <style>
-/* Sohbet Widget */
-.chat-widget {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 350px;
-  height: 500px; /* Sabit yükseklik */
-  background: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  overflow: hidden;
-  display: none;
-  flex-direction: column;
-  z-index: 9999;
-}
 
-.chat-header {
-  background: #21ad26;
-  color: white;
-  padding: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.chat-header button {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-/* Sohbet İçeriği */
-.chat-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.mentor-list {
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
-  overflow-y: auto;
-  max-height: 150px;
-  max-height: calc(100% - 50px);
-}
-
-.status-indicator {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-left: auto; /* Align to the right */
-}
-
-/* Mentör Listesi */
-.mentor-item {
-  display: flex;
-  align-items: center;
-  padding: 5px 0;
-  cursor: pointer;
-}
-
-.mentor-item img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.mentor-list.hidden {
-  display: none; /* Mentör listesi gizlemek için */
-}
-
-.chat-box {
-  display: none; /* Başlangıçta gizli */
-  flex-grow: 1;
-  flex-direction: column;
-  max-height: calc(100% - 50px);
-  overflow-y: auto;
-}
-
-.chat-box.active {
-  display: flex; /* Mentöre tıklandığında görünür */
-}
-
-.messages {
-  flex-grow: 1;
-  padding: 10px;
-  overflow-y: auto;
-  border-top: 1px solid #ccc;
-}
-
-textarea {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-top: 1px solid #ccc;
-  resize: none;
-}
-
-#send-btn {
-  background: #21ad26;
-  color: white;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-}
-
-.chat-toggle {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
-  background: #21ad26;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 10000;
-}
-#back-btn {
-  font-size: 16px;
-  margin-right: 10px;
-  background: transparent;
-  border: none;
-  color: white;
-  cursor: pointer;
-  display: none; /* Başlangıçta gizli */
-}
-
-/* Sohbet ekranı aktifken geri butonu görünsün */
-.chat-box.active #back-btn {
-  display: inline-block;
-}
-.messages {
-  padding: 10px;
-  overflow-y: auto; /* Kaydırılabilir içerik */
-  max-height: 400px; /* Sabit yüksekliği koru */
-}
-
-/* Soldaki mesajlar (karşı tarafın mesajları) */
-.message-left {
-  text-align: left; /* Yazıyı sola hizala */
-  color: #000; /* Siyah yazı */
-  margin: 5px 0;
-  padding: 5px;
-}
-
-/* Sağdaki mesajlar (kullanıcının mesajları) */
-.message-right {
-  text-align: right; /* Yazıyı sağa hizala */
-  color: #007bff; /* Mavi yazı */
-  margin: 5px 0;
-  padding: 5px;
-}
     </style>
 </head>
 <body>
-<div class="chat-widget">
-  <div class="chat-header">
-    <button id="back-btn" onclick="goBackToList()" style="display: none;">&larr;</button>
-    <span id="chat-header-title">Mentörler ile Canlı Sohbet</span>
-    <button id="close-btn" onclick="toggleChat()">&times;</button>
-  </div>
-    <div class="chat-content">
-      <div class="mentor-list" id="mentor-list"></div>
-      <div class="chat-box" id="chat-box">
-        <div class="messages" id="messages"></div>
-        <textarea id="message-input" placeholder="Mesajınızı yazın..."></textarea>
-        <button id="send-btn" onclick="sendMessage()">Gönder</button>
-      </div>
-    </div>
-  </div>
+<header class="navigation fixed-top">
+  <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-white">
+      <a class="navbar-brand order-1" href="index.php">
+        <img class="img-fluid" width="100px" src="images/logo.png"
+          alt=".blendHub">
+      </a>
+      <div class="collapse navbar-collapse text-center order-lg-2 order-3" id="navigation">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item dropdown">
+            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false">
+              anasayfa <i class="ti-angle-down ml-1"></i>
+            </a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="index-full.html">Homepage Full Width</a>
+              
+              <a class="dropdown-item" href="index-full-left.html">Homepage Full With Left Sidebar</a>
+              
+              <a class="dropdown-item" href="index-full-right.html">Homepage Full With Right Sidebar</a>
+              
+              <a class="dropdown-item" href="index-list.html">Homepage List Style</a>
+              
+              <a class="dropdown-item" href="index-list-left.html">Homepage List With Left Sidebar</a>
+              
+              <a class="dropdown-item" href="index-list-right.html">Homepage List With Right Sidebar</a>
+              
+              <a class="dropdown-item" href="index-grid.html">Homepage Grid Style</a>
+              
+              <a class="dropdown-item" href="index-grid-left.html">Homepage Grid With Left Sidebar</a>
+              
+              <a class="dropdown-item" href="index-grid-right.html">Homepage Grid With Right Sidebar</a>
+              
+            </div>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false">
+              yazılar <i class="ti-angle-down ml-1"></i>
+            </a>
+            <div class="dropdown-menu">
+              
+              <a class="dropdown-item" href="about-me.html">About Me</a>
+              
+              <a class="dropdown-item" href="about-us.html">About Us</a>
+              
+            </div>
+          </li>
 
-  <div class="chat-toggle" onclick="toggleChat()">
-  💬
+          <li class="nav-item">
+            <a class="nav-link" href="contact.html">mentörler</a>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false">hakkımızda <i class="ti-angle-down ml-1"></i>
+            </a>
+            <div class="dropdown-menu">
+              
+              <a class="dropdown-item" href="author.html">Author</a>
+              
+              <a class="dropdown-item" href="author-single.html">Author Single</a>
+
+              <a class="dropdown-item" href="advertise.html">Advertise</a>
+              
+              <a class="dropdown-item" href="post-details.html">Post Details</a>
+              
+              <a class="dropdown-item" href="post-elements.html">Post Elements</a>
+              
+              <a class="dropdown-item" href="tags.html">Tags</a>
+
+              <a class="dropdown-item" href="search-result.html">Search Result</a>
+
+              <a class="dropdown-item" href="search-not-found.html">Search Not Found</a>
+              
+              <a class="dropdown-item" href="privacy-policy.html">Privacy Policy</a>
+              
+              <a class="dropdown-item" href="terms-conditions.html">Terms Conditions</a>
+
+              <a class="dropdown-item" href="404.html">404 Page</a>
+              
+            </div>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="shop.html">yardım</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="shop.html">iletişim</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="order-2 order-lg-3 d-flex align-items-center">
+        
+        <form class="search-bar">
+          <input id="search-query" name="s" type="search" placeholder="Type &amp; Hit Enter...">
+        </form>
+        
+        <button class="navbar-toggler border-0 order-1" type="button" data-toggle="collapse" data-target="#navigation">
+          <i class="ti-menu"></i>
+        </button>
+          <?php if (isset($_SESSION['user_id'])): ?>
+        <div class="dropdown" style="margin-left: 25px;">
+            <a href="profile.php?slug=<?php echo $_SESSION['slug']; ?>" class="dropdown-toggle" id="profileDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <?php if (!empty($_SESSION['profile_picture'])): ?>
+                    <img src="data:image/jpeg;base64,<?php echo htmlspecialchars($_SESSION['profile_picture']); ?>" alt="Profil Fotoğrafı" width="40" height="40" class="rounded-circle">
+                <?php else: ?>
+                    <img src="images/dprofile.jpg" alt="Varsayılan Profil Fotoğrafı" width="40" height="40" class="rounded-circle">
+                <?php endif; ?>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
+                <a class="dropdown-item" href="profile.php?slug=<?php echo $_SESSION['slug']; ?>">Profilim</a>
+                <a class="dropdown-item" href="settings.php">Ayarlar</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="logout.php" onclick="return confirm('Çıkış yapmak istediğinize emin misiniz?');">Çıkış Yap</a>
+            </div>
+        </div>
+    <?php else: ?>
+        <a href="login.php" style="margin-left: 25px; color: green">Giriş Yap</a>
+    <?php endif; ?>
+        </div>
+      </div>
+
+    </nav>
   </div>
+</header>
+<?php include 'chat-widget.html'; ?>
 <div class="banner text-center">
   <div class="container">
     <div class="row">
@@ -284,6 +237,7 @@ textarea {
       stroke-width="2" />
   </svg>
 </div>
+<!--
 <section class="section pb-0">
   <div class="container">
     <div class="row">
@@ -418,12 +372,12 @@ textarea {
     </div>
   </div>
 </section>
-
+    -->
 <section class="section-sm">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-lg-8  mb-5 mb-lg-0">
-  <h2 class="h5 section-title">Recent Post</h2>
+  <h2 class="h5 section-title">Son Bloglar</h2>
   <?php
 include 'db_connection.php';
 
@@ -480,7 +434,7 @@ while ($row = $result->fetch_assoc()) :
                 </a>
             </li>
             <li class="list-inline-item">
-                <i class="ti-timer"></i> <?php echo $reading_time; ?> Min To Read
+                <i class="ti-timer"></i> <?php echo $reading_time; ?> dk. okunabilir
             </li>
             <li class="list-inline-item">
                 <i class="ti-calendar"></i> <?php 
@@ -520,209 +474,9 @@ while ($row = $result->fetch_assoc()) :
     </div>
 </article>
 <?php endwhile; ?>
-
-  <article class="card mb-4">
-  <div class="post-slider">
-      <img src="images/post/post-10.jpg" class="card-img-top" alt="post-thumb">
-      <img src="images/post/post-1.jpg" class="card-img-top" alt="post-thumb">
-  </div>
-  <div class="card-body">
-      <h3 class="mb-3"><a class="post-title" href="post-elements.html">Elements That You Can Use In This Template.</a></h3>
-      <ul class="card-meta list-inline">
-      <li class="list-inline-item">
-          <a href="author-single.html" class="card-meta-author">
-          <img src="images/john-doe.jpg" alt="John Doe">
-          <span>John Doe</span>
-          </a>
-      </li>
-      <li class="list-inline-item">
-          <i class="ti-timer"></i>3 Min To Read
-      </li>
-      <li class="list-inline-item">
-          <i class="ti-calendar"></i>15 jan, 2020
-      </li>
-      <li class="list-inline-item">
-          <ul class="card-meta-tag list-inline">
-          <li class="list-inline-item"><a href="tags.html">Demo</a></li>
-          <li class="list-inline-item"><a href="tags.html">Elements</a></li>
-          </ul>
-      </li>
-      </ul>
-      <p>Heading example Here is example of hedings. You can use this heading by following markdownify rules. For example: use # for heading 1 and use ###### for heading 6.</p>
-      <a href="post-elements.html" class="btn btn-outline-primary">Read More</a>
-  </div>
-  </article>
-
-  <article class="card mb-4">
-  <div class="post-slider">
-      <img src="images/post/post-3.jpg" class="card-img-top" alt="post-thumb">
-  </div>
-  <div class="card-body">
-      <h3 class="mb-3"><a class="post-title" href="post-details.html">Advice From a Twenty Something</a></h3>
-      <ul class="card-meta list-inline">
-      <li class="list-inline-item">
-          <a href="author-single.html" class="card-meta-author">
-          <img src="images/john-doe.jpg">
-          <span>Mark Dinn</span>
-          </a>
-      </li>
-      <li class="list-inline-item">
-          <i class="ti-timer"></i>2 Min To Read
-      </li>
-      <li class="list-inline-item">
-          <i class="ti-calendar"></i>14 jan, 2020
-      </li>
-      <li class="list-inline-item">
-          <ul class="card-meta-tag list-inline">
-          <li class="list-inline-item"><a href="tags.html">Decorate</a></li>
-          <li class="list-inline-item"><a href="tags.html">Creative</a></li>
-          </ul>
-      </li>
-      </ul>
-      <p>It’s no secret that the digital industry is booming. From exciting startups to global brands, companies are reaching out to digital agencies, responding to the new possibilities available.</p>
-      <a href="post-details.html" class="btn btn-outline-primary">Read More</a>
-  </div>
-  </article>
-
-  <article class="card mb-4">
-  <div class="post-slider">
-      <img src="images/post/post-7.jpg" class="card-img-top" alt="post-thumb">
-  </div>
-  
-  <div class="card-body">
-      <h3 class="mb-3"><a class="post-title" href="post-details.html">Advice From a Twenty Something</a></h3>
-      <ul class="card-meta list-inline">
-      <li class="list-inline-item">
-          <a href="author-single.html" class="card-meta-author">
-          <img src="images/john-doe.jpg">
-          <span>Charls Xaviar</span>
-          </a>
-      </li>
-      <li class="list-inline-item">
-          <i class="ti-timer"></i>2 Min To Read
-      </li>
-      <li class="list-inline-item">
-          <i class="ti-calendar"></i>14 jan, 2020
-      </li>
-      <li class="list-inline-item">
-          <ul class="card-meta-tag list-inline">
-          <li class="list-inline-item"><a href="tags.html">Color</a></li>
-          <li class="list-inline-item"><a href="tags.html">Recipe</a></li>
-          <li class="list-inline-item"><a href="tags.html">Fish</a></li>
-          </ul>
-      </li>
-      </ul>
-      <p>It’s no secret that the digital industry is booming. From exciting startups to global brands, companies are reaching out to digital agencies, responding to the new possibilities available.</p>
-      <a href="post-details.html" class="btn btn-outline-primary">Read More</a>
-  </div>
-  </article>
-  
-  <article class="card mb-4">
-  <div class="card-body">
-      <h3 class="mb-3"><a class="post-title" href="post-details.html">Cheerful Loving Couple Bakers Drinking Coffee</a></h3>
-      <ul class="card-meta list-inline">
-      <li class="list-inline-item">
-          <a href="author-single.html" class="card-meta-author">
-          <img src="images/kate-stone.jpg" alt="Kate Stone">
-          <span>Kate Stone</span>
-          </a>
-      </li>
-      <li class="list-inline-item">
-          <i class="ti-timer"></i>2 Min To Read
-      </li>
-      <li class="list-inline-item">
-          <i class="ti-calendar"></i>14 jan, 2020
-      </li>
-      <li class="list-inline-item">
-          <ul class="card-meta-tag list-inline">
-          <li class="list-inline-item"><a href="tags.html">Wow</a></li>
-          <li class="list-inline-item"><a href="tags.html">Tasty</a></li>
-          </ul>
-      </li>
-      </ul>
-      <p>It’s no secret that the digital industry is booming. From exciting startups to global brands, companies are reaching out to digital agencies, responding to the new possibilities available.</p>
-      <a href="post-details.html" class="btn btn-outline-primary">Read More</a>
-  </div>
-  </article>
-  
-  <article class="card mb-4">
-  <div class="post-slider">
-      <img src="images/post/post-5.jpg" class="card-img-top" alt="post-thumb">
-  </div>
-  <div class="card-body">
-      <h3 class="mb-3"><a class="post-title" href="post-details.html">How To Make Cupcakes and Cashmere Recipe At Home</a></h3>
-      <ul class="card-meta list-inline">
-      <li class="list-inline-item">
-          <a href="author-single.html" class="card-meta-author">
-          <img src="images/kate-stone.jpg" alt="Kate Stone">
-          <span>Kate Stone</span>
-          </a>
-      </li>
-      <li class="list-inline-item">
-          <i class="ti-timer"></i>2 Min To Read
-      </li>
-      <li class="list-inline-item">
-          <i class="ti-calendar"></i>14 jan, 2020
-      </li>
-      <li class="list-inline-item">
-          <ul class="card-meta-tag list-inline">
-          <li class="list-inline-item"><a href="tags.html">City</a></li>
-          <li class="list-inline-item"><a href="tags.html">Food</a></li>
-          <li class="list-inline-item"><a href="tags.html">Taste</a></li>
-          </ul>
-      </li>
-      </ul>
-      <p>It’s no secret that the digital industry is booming. From exciting startups to global brands, companies are reaching out to digital agencies, responding to the new possibilities available.</p>
-      <a href="post-details.html" class="btn btn-outline-primary">Read More</a>
-  </div>
-  </article>
-  
-  <article class="card mb-4">
-  <div class="post-slider">
-      <img src="images/post/post-8.jpg" class="card-img-top" alt="post-thumb">
-      <img src="images/post/post-9.jpg" class="card-img-top" alt="post-thumb">
-  </div>
-  <div class="card-body">
-      <h3 class="mb-3"><a class="post-title" href="post-details.html">How To Make Cupcakes and Cashmere Recipe At Home</a></h3>
-      <ul class="card-meta list-inline">
-      <li class="list-inline-item">
-          <a href="author-single.html" class="card-meta-author">
-          <img src="images/john-doe.jpg" alt="John Doe">
-          <span>John Doe</span>
-          </a>
-      </li>
-      <li class="list-inline-item">
-          <i class="ti-timer"></i>2 Min To Read
-      </li>
-      <li class="list-inline-item">
-          <i class="ti-calendar"></i>14 jan, 2020
-      </li>
-      <li class="list-inline-item">
-          <ul class="card-meta-tag list-inline">
-          <li class="list-inline-item"><a href="tags.html">Color</a></li>
-          <li class="list-inline-item"><a href="tags.html">Recipe</a></li>
-          <li class="list-inline-item"><a href="tags.html">Fish</a></li>
-          </ul>
-      </li>
-      </ul>
-      <p>It’s no secret that the digital industry is booming. From exciting startups to global brands, companies are reaching out to digital agencies, responding to the new possibilities available.</p>
-      <a href="post-details.html" class="btn btn-outline-primary">Read More</a>
-  </div>
-  </article>
-  
-  <ul class="pagination justify-content-center">
-    <li class="page-item page-item active ">
-        <a href="#!" class="page-link">1</a>
-    </li>
-    <li class="page-item">
-        <a href="#!" class="page-link">2</a>
-    </li>
-    <li class="page-item">
-        <a href="#!" class="page-link">&raquo;</a>
-    </li>
-  </ul>
 </div>
-      <aside class="col-lg-4 sidebar-home">
+
+<aside class="col-lg-4 sidebar-home">
 
 <div class="widget">
   <h4 class="widget-title"><span>BLOG PAYLAŞ!</span></h4> 
@@ -737,7 +491,7 @@ while ($row = $result->fetch_assoc()) :
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form id="addPostForm" method="POST" action="add_post.php" enctype="multipart/form-data">
+      <form id="blog-form" method="POST" action="add_post.php" enctype="multipart/form-data">
         <div class="modal-body">
           <div class="form-group">
             <label for="postTitle">Başlık</label>
@@ -764,38 +518,6 @@ while ($row = $result->fetch_assoc()) :
     </div>
   </div>
 </div>
-
-      <!-- Mentör Ol Button 
-<div class="widget">
-    <h4 class="widget-title"><span>Sen de mentörlerimiz arasına katılmak ister misin?</span></h4>
-      <button type="submit" id="mentorButton" class="btn btn-primary btn-block" name="mentorapplication" data-toggle="modal" data-target="#mentorModal">Mentör Ol</button>
-  </div>
-
- Mentör Ol Modal 
-<div id="mentorModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;">
-    <div class="modal-content" style="background: #fff; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px;">
-        <h3>Mentörlük Başvuru Formu</h3>
-        <form id="mentorForm" method="POST" action="mentor_application.php">
-            <div class="form-group">
-                <label for="fullName">Ad Soyad</label>
-                <input type="text" id="fullName" name="fullName" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="email">E-posta</label>
-                <input type="email" id="email" name="email" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="expertise">Uzmanlık Alanı</label>
-                <input type="text" id="expertise" name="expertise" class="form-control" required>
-            </div>
-            <p id="mentor-login-warning" style="color: red; display: none;">
-                Mentörlük başvurusu yapabilmek için <a href="login.php">giriş yapınız.</a>
-            </p>
-            <button type="submit" class="btn btn-success">Başvur</button>
-            <button type="button" id="closeModal" class="btn btn-secondary">İptal</button>
-        </form>
-    </div>
-</div>  -->
 <div class="widget">
   <h4 class="widget-title"><span>Sen de mentörlerimiz arasına katılmak ister misin?</span></h4>
     <button type="submit" id="mentorButton" class="btn btn-primary btn-block" name="mentorApplication" data-toggle="modal" data-target="#mentorModal">Başvur</button>
@@ -809,7 +531,7 @@ while ($row = $result->fetch_assoc()) :
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form id="mentorForm" method="POST" action="mentor_application.php" enctype="multipart/form-data">
+      <form id="mentor-form" method="POST" action="mentor_application.php" enctype="multipart/form-data">
       <div class="modal-body">
       <div class="form-group">
                 <label for="fullName">Ad Soyad</label>
@@ -827,51 +549,14 @@ while ($row = $result->fetch_assoc()) :
                 Mentörlük başvurusu yapabilmek için <a href="login.php">giriş yapınız.</a>
             </p>
             <button type="submit" class="btn btn-primary">Başvur</button>
-            <button type="button" id="closeModal" class="btn btn-secondary">İptal</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
       </form>
+      </div>
     </div>
   </div>
 </div>
-                    </div>
-  <div class="widget">
-    <h4 class="widget-title"><span>Search</span></h4>
-    <form action="#!" class="widget-search">
-      <input class="mb-3" id="search-query" name="s" type="search" placeholder="Type &amp; Hit Enter...">
-      <i class="ti-search"></i>
-      <button type="submit" class="btn btn-primary btn-block">Search</button>
-    </form>
-  </div>
 
-  <div class="widget widget-about">
-    <h4 class="widget-title">Hi, I am Alex!</h4>
-    <img class="img-fluid" src="images/author.jpg" alt="Themefisher">
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vel in in donec iaculis tempus odio nunc laoreet . Libero ullamcorper.</p>
-    <ul class="list-inline social-icons mb-3">
-      
-      <li class="list-inline-item"><a href="#"><i class="ti-facebook"></i></a></li>
-      
-      <li class="list-inline-item"><a href="#"><i class="ti-twitter-alt"></i></a></li>
-      
-      <li class="list-inline-item"><a href="#"><i class="ti-linkedin"></i></a></li>
-      
-      <li class="list-inline-item"><a href="#"><i class="ti-github"></i></a></li>
-      
-      <li class="list-inline-item"><a href="#"><i class="ti-youtube"></i></a></li>
-      
-    </ul>
-    <a href="about-me.html" class="btn btn-primary mb-2">About me</a>
-  </div>
-  
-  <div class="promotion">
-    <img src="images/promotion.jpg" class="img-fluid w-100">
-    <div class="promotion-content">
-      <h5 class="text-white mb-3">Create Stunning Website!!</h5>
-      <p class="text-white mb-4">Lorem ipsum dolor sit amet, consectetur sociis. Etiam nunc amet id dignissim. Feugiat id tempor vel sit ornare turpis posuere.</p>
-      <a href="https://themefisher.com/" class="btn btn-primary">Get Started</a>
-    </div>
-  </div>
-
-  <div class="widget widget-author">
+  <!--<div class="widget widget-author">
     <h4 class="widget-title">Authors</h4>
     <?php foreach ($authors as $author): ?>
         <div class="media align-items-center">
@@ -890,117 +575,44 @@ while ($row = $result->fetch_assoc()) :
             </div>
         </div>
     <?php endforeach; ?>
-</div>
-
-  
-  
-  <div class="widget">
-    <h4 class="widget-title"><span>Never Miss A News</span></h4>
-    <form action="#!" method="post" name="mc-embedded-subscribe-form" target="_blank"
-      class="widget-search">
-      <input class="mb-3" id="search-query" name="s" type="search" placeholder="Your Email Address">
-      <i class="ti-email"></i>
-      <button type="submit" class="btn btn-primary btn-block" name="subscribe">Subscribe now</button>
-      <div style="position: absolute; left: -5000px;" aria-hidden="true">
-        <input type="text" name="b_463ee871f45d2d93748e77cad_a0a2c6d074" tabindex="-1">
-      </div>
-    </form>
   </div>
-
+    -->
   <div class="widget widget-categories">
-    <h4 class="widget-title"><span>Categories</span></h4>
+    <h4 class="widget-title"><span>Kategoriler</span></h4>
     <ul class="list-unstyled widget-list">
-      <li><a href="tags.html" class="d-flex">Creativity <small class="ml-auto">(4)</small></a></li>
-      <li><a href="tags.html" class="d-flex">Demo <small class="ml-auto">(1)</small></a></li>
-      <li><a href="tags.html" class="d-flex">Elements <small class="ml-auto">(1)</small></a></li>
-      <li><a href="tags.html" class="d-flex">Food <small class="ml-auto">(1)</small></a></li>
-      <li><a href="tags.html" class="d-flex">Microwave <small class="ml-auto">(1)</small></a></li>
-      <li><a href="tags.html" class="d-flex">Natural <small class="ml-auto">(3)</small></a></li>
-      <li><a href="tags.html" class="d-flex">Newyork city <small class="ml-auto">(1)</small></a></li>
-      <li><a href="tags.html" class="d-flex">Nice <small class="ml-auto">(1)</small></a></li>
-      <li><a href="tags.html" class="d-flex">Tech <small class="ml-auto">(2)</small></a></li>
-      <li><a href="tags.html" class="d-flex">Videography <small class="ml-auto">(1)</small></a></li>
-      <li><a href="tags.html" class="d-flex">Vlog <small class="ml-auto">(1)</small></a></li>
-      <li><a href="tags.html" class="d-flex">Wondarland <small class="ml-auto">(1)</small></a></li>
+      <?php
+        include 'db_connection.php';
+        try {
+          $query = "
+              SELECT c.name AS category_name, COUNT(pc.post_id) AS blog_count
+              FROM categories c
+              LEFT JOIN postcategories pc ON c.category_id = pc.category_id
+              GROUP BY c.category_id, c.name
+              ORDER BY c.name ASC;
+          ";
+          $stmt = $conn->prepare($query);
+          $stmt->execute();
+          $categories = $stmt->get_result();
+          if ($categories->num_rows > 0) {
+              while ($row = $categories->fetch_assoc()) {
+                  echo '<li>';
+                  echo '<a href="tags.html" class="d-flex">';
+                  echo htmlspecialchars($row['category_name']);
+                  echo ' <small class="ml-auto">(' . $row['blog_count'] . ')</small>';
+                  echo '</a>';
+                  echo '</li>';
+              }
+          } else {
+              echo '<li>Kategori bulunamadı.</li>';
+          }
+      } catch (Exception $e) {
+          echo '<li>Hata: ' . $e->getMessage() . '</li>';
+      }
+      $conn->close();
+      ?>
     </ul>
-  </div>
-  <div class="widget">
-    <h4 class="widget-title"><span>Tags</span></h4>
-    <ul class="list-inline widget-list-inline widget-card">
-      <li class="list-inline-item"><a href="tags.html">City</a></li>
-      <li class="list-inline-item"><a href="tags.html">Color</a></li>
-      <li class="list-inline-item"><a href="tags.html">Creative</a></li>
-      <li class="list-inline-item"><a href="tags.html">Decorate</a></li>
-      <li class="list-inline-item"><a href="tags.html">Demo</a></li>
-      <li class="list-inline-item"><a href="tags.html">Elements</a></li>
-      <li class="list-inline-item"><a href="tags.html">Fish</a></li>
-      <li class="list-inline-item"><a href="tags.html">Food</a></li>
-      <li class="list-inline-item"><a href="tags.html">Nice</a></li>
-      <li class="list-inline-item"><a href="tags.html">Recipe</a></li>
-      <li class="list-inline-item"><a href="tags.html">Season</a></li>
-      <li class="list-inline-item"><a href="tags.html">Taste</a></li>
-      <li class="list-inline-item"><a href="tags.html">Tasty</a></li>
-      <li class="list-inline-item"><a href="tags.html">Vlog</a></li>
-      <li class="list-inline-item"><a href="tags.html">Wow</a></li>
-    </ul>
-  </div>
-  <div class="widget">
-    <h4 class="widget-title">Recent Post</h4>
-
-    <article class="widget-card">
-      <div class="d-flex">
-        <img class="card-img-sm" src="images/post/post-10.jpg">
-        <div class="ml-3">
-          <h5><a class="post-title" href="post/elements/">Elements That You Can Use In This Template.</a></h5>
-          <ul class="card-meta list-inline mb-0">
-            <li class="list-inline-item mb-0">
-              <i class="ti-calendar"></i>15 jan, 2020
-            </li>
-          </ul>
-        </div>
-      </div>
-    </article>
-    
-    <article class="widget-card">
-      <div class="d-flex">
-        <img class="card-img-sm" src="images/post/post-3.jpg">
-        <div class="ml-3">
-          <h5><a class="post-title" href="post-details.html">Advice From a Twenty Something</a></h5>
-          <ul class="card-meta list-inline mb-0">
-            <li class="list-inline-item mb-0">
-              <i class="ti-calendar"></i>14 jan, 2020
-            </li>
-          </ul>
-        </div>
-      </div>
-    </article>
-    
-    <article class="widget-card">
-      <div class="d-flex">
-        <img class="card-img-sm" src="images/post/post-7.jpg">
-        <div class="ml-3">
-          <h5><a class="post-title" href="post-details.html">Advice From a Twenty Something</a></h5>
-          <ul class="card-meta list-inline mb-0">
-            <li class="list-inline-item mb-0">
-              <i class="ti-calendar"></i>14 jan, 2020
-            </li>
-          </ul>
-        </div>
-      </div>
-    </article>
   </div>
 
-  <!-- Social -->
-  <div class="widget">
-    <h4 class="widget-title"><span>Social Links</span></h4>
-    <ul class="list-inline widget-social">
-      <li class="list-inline-item"><a href="#"><i class="ti-facebook"></i></a></li>
-      <li class="list-inline-item"><a href="#"><i class="ti-twitter-alt"></i></a></li>
-      <li class="list-inline-item"><a href="#"><i class="ti-linkedin"></i></a></li>
-      <li class="list-inline-item"><a href="#"><i class="ti-github"></i></a></li>
-      <li class="list-inline-item"><a href="#"><i class="ti-youtube"></i></a></li>
-    </ul>
-  </div>
 </aside>
     </div>
   </div>
@@ -1063,205 +675,54 @@ while ($row = $result->fetch_assoc()) :
   </footer>
 
   <script>
-async function updateChatHeader() {
-  const response = await fetch('get_user_role.php');
-  const { role } = await response.json(); // Kullanıcı rolünü al
-  const chatHeader = document.querySelector('.chat-header span');
-  chatHeader.textContent = role === 'mentor' 
-    ? 'Kullanıcılar ile Canlı Sohbet' 
-    : 'Mentörler ile Canlı Sohbet';
-}
+document.addEventListener('DOMContentLoaded', function () {
+    checkLoginStatus();
 
-// Sohbet widget'ı ve listeyi yükle
-document.addEventListener('DOMContentLoaded', () => {
-  updateChatHeader(); // Başlığı güncelle
-  loadChatList(); // Sohbet listesi yüklensin
+    async function checkLoginStatus() {
+        try {
+            const response = await fetch('is_logged_in.php');
+            if (!response.ok) {
+                throw new Error('Sunucudan geçerli bir yanıt alınamadı');
+            }
+
+            const data = await response.json();
+
+            // Blog Ekleme Formu
+            const blogWarning = document.getElementById('blog-login-warning');
+            const blogSubmit = document.querySelector('#blog-form button[type="submit"]');
+
+            if (data.logged_in) {
+                // Kullanıcı giriş yapmışsa uyarıyı gizle ve butonu aktif et
+                if (blogWarning) blogWarning.style.display = 'none';
+                if (blogSubmit) blogSubmit.disabled = false;
+            } else {
+                // Kullanıcı giriş yapmamışsa uyarıyı göster ve butonu pasif et
+                if (blogWarning) blogWarning.style.display = 'block';
+                if (blogSubmit) blogSubmit.disabled = true;
+            }
+
+            // Mentörlük Başvuru Formu
+            const mentorWarning = document.getElementById('mentor-login-warning');
+            const mentorSubmit = document.querySelector('#mentor-form button[type="submit"]');
+
+            if (data.logged_in) {
+                // Kullanıcı giriş yapmışsa uyarıyı gizle ve butonu aktif et
+                if (mentorWarning) mentorWarning.style.display = 'none';
+                if (mentorSubmit) mentorSubmit.disabled = false;
+            } else {
+                // Kullanıcı giriş yapmamışsa uyarıyı göster ve butonu pasif et
+                if (mentorWarning) mentorWarning.style.display = 'block';
+                if (mentorSubmit) mentorSubmit.disabled = true;
+            }
+        } catch (error) {
+            console.error('Giriş durumu kontrol edilirken bir hata oluştu:', error);
+        }
+    }
 });
 
-let chatInterval;
-
-async function loadChatList() {
-  const response = await fetch('get_chat_list.php');
-  const chatList = await response.json();
-  const mentorList = document.getElementById('mentor-list');
-  mentorList.innerHTML = '';
-
-  chatList.forEach(person => {
-    const div = document.createElement('div');
-    div.className = 'mentor-item';
-    div.innerHTML = person.profile_picture
-      ? `<img src="data:image/jpeg;base64,${person.profile_picture}" alt="${person.username}">`
-      : `<img src="images/dprofile.jpg" alt="Default Profile Picture">`;
-
-    div.innerHTML += `<span>${person.username}</span>`;
-    div.innerHTML += `<div class="status-indicator" style="background-color: ${
-  (person.is_online == 1) ? 'green' : 'gray'
-};"></div>`;
-    div.onclick = () => openChat(person.user_id, person.username);
-    mentorList.appendChild(div);
-  });
-}
-
-// Sohbet widget'ını aç/kapa
-function toggleChat() {
-  const chatWidget = document.querySelector('.chat-widget');
-  const chatToggle = document.querySelector('.chat-toggle');
-  const chatBox = document.getElementById('chat-box');
-  const mentorList = document.getElementById('mentor-list');
-  const backBtn = document.getElementById('back-btn');
-
-  // Sohbet widget'ını aç/kapa
-  if (chatWidget.style.display === 'flex') {
-    chatWidget.style.display = 'none'; // Kapat
-    chatToggle.style.display = 'flex'; // Balon görünsün
-    chatBox.classList.remove('active'); // Sohbet ekranını gizle
-    mentorList.style.display = 'block'; // Mentör listesi gösterilsin
-    backBtn.style.display = 'none'; // Geri butonunu gizle
-
-    // Mesaj yenileme intervalini durdur
-    if (chatInterval) {
-      clearInterval(chatInterval);
-    }
-  } else {
-    chatWidget.style.display = 'flex'; // Aç
-    chatToggle.style.display = 'none'; // Balon gizlensin
-  }
-}
-
-// Sohbet ekranını aç ve mesajları yükle
-async function openChat(mentorId, mentorName) {
-  const chatBox = document.getElementById('chat-box');
-  const messagesDiv = document.getElementById('messages');
-  const mentorList = document.getElementById('mentor-list');
-  const backBtn = document.getElementById('back-btn');
-
-  mentorList.style.display = 'none'; // Mentör listesini gizle
-  chatBox.dataset.mentorId = mentorId;
-  chatBox.classList.add('active'); // Sohbet ekranını görünür yap
-  backBtn.style.display = 'inline-block'; // Geri butonunu göster
-  messagesDiv.innerHTML = `<h3>${mentorName} ile sohbet</h3>`; // Başlığı güncelle
-
-  await loadMessages(mentorId); // Mesajları yükle
-
-  // Mesajları otomatik yenile
-  if (chatInterval) {
-    clearInterval(chatInterval); // Daha önceki interval varsa temizle
-  }
-  chatInterval = setInterval(() => {
-    loadMessages(mentorId);
-  }, 2000);
-
-}
-
-// Sohbet listesini geri yükle
-function goBackToList() {
-  const chatBox = document.getElementById('chat-box');
-  const mentorList = document.getElementById('mentor-list');
-  const backBtn = document.getElementById('back-btn');
-
-  chatBox.classList.remove('active'); // Sohbet ekranını gizle
-  mentorList.style.display = 'block'; // Liste ekranını göster
-  backBtn.style.display = 'none'; // Geri butonunu gizle
-
-  if (chatInterval) {
-    clearInterval(chatInterval); // Mesaj yenileme intervalini durdur
-  }
-}
-
-// Sohbet ekranını kapat
-function closeChat() {
-  const chatBox = document.getElementById('chat-box');
-  const mentorList = document.getElementById('mentor-list');
-  chatBox.classList.remove('active');
-  mentorList.style.display = 'block'; // Mentör listesini tekrar göster
-  if (chatInterval) {
-    clearInterval(chatInterval); // Interval durdur
-  }
-}
-
-// Mesajları yükle
-async function loadMessages(mentorId) {
-  const response = await fetch(`get_messages.php?mentorId=${mentorId}`);
-  const messages = await response.json();
-  const messagesDiv = document.getElementById('messages');
-  messagesDiv.innerHTML = ''; // Önceki mesajları temizle
-
-  // Son mesajı bulmak için toplam mesaj sayısını kontrol edin
-  const totalMessages = messages.length;
-
-  messages.forEach((message, index) => {
-    const isCurrentUser = message.is_current_user;
-    const div = document.createElement('div');
-    div.className = isCurrentUser == 1 ? 'message-right' : 'message-left';
-
-    // Mesaj içeriğini ekle
-    if (isCurrentUser == 1) {
-      div.innerHTML = `<span>${message.message}</span>`;
-    } else {
-      div.innerHTML = `<strong>${message.sender_name}:</strong> <span>${message.message}</span>`;
-    }
-
-    messagesDiv.appendChild(div);
-  });
-}
-
-// Mesaj gönderme
-async function sendMessage() {
-  const mentorId = document.getElementById('chat-box').dataset.mentorId;
-  const messageInput = document.getElementById('message-input');
-  const message = messageInput.value;
-  if (message.trim()) {
-    const response = await fetch('send_message.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mentorId, message }),
-    });
-    const result = await response.json();
-    if (result.success) {
-      messageInput.value = ''; // Mesajı temizle
-      loadMessages(mentorId); // Mesajları yeniden yükle
-    } else {
-      alert('Mesaj gönderilirken bir hata oluştu.');
-    }
-  }
-}
-
-// Giriş durumu kontrolü
-async function checkLoginStatus() {
-  const response = await fetch('is_logged_in.php');
-  const data = await response.json();
-
-  // Blog Ekleme Formu
-  const blogForm = document.getElementById('blog-form');
-  const blogWarning = document.getElementById('blog-login-warning');
-  const blogSubmit = document.getElementById('submit-blog');
-
-  // Mentörlük Başvuru Formu
-  const mentorForm = document.getElementById('mentor-form');
-  const mentorWarning = document.getElementById('mentor-login-warning');
-  const mentorSubmit = document.getElementById('submit-mentor');
-
-  if (data.logged_in) {
-    // Kullanıcı giriş yapmışsa butonları aktif et
-    if (blogForm) blogSubmit.disabled = false;
-    if (blogWarning) blogWarning.style.display = 'none';
-
-    if (mentorForm) mentorSubmit.disabled = false;
-    if (mentorWarning) mentorWarning.style.display = 'none';
-  } else {
-    // Kullanıcı giriş yapmamışsa uyarı göster
-    if (blogForm) blogSubmit.disabled = true;
-    if (blogWarning) blogWarning.style.display = 'block';
-
-    if (mentorForm) mentorSubmit.disabled = true;
-    if (mentorWarning) mentorWarning.style.display = 'block';
-  }
-}
-
-setInterval(async () => {
-  await fetch('update_activity.php', { method: 'POST' });
-}, 12000);
   </script>
+
+  <script src="js/chat.js"></script>
 
   <script src="plugins/jQuery/jquery.min.js"></script>
 

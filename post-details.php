@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'header.php';
+//include 'header.php';
 include 'db_connection.php';
 
 // Gelen post_id parametresini alın
@@ -10,7 +10,7 @@ if (!$post_id) {
 }
 
 // Post bilgilerini alın
-$post_query = "SELECT posts.*, users.username, users.profile_picture 
+$post_query = "SELECT posts.*, users.username, users.profile_picture, users.slug
                FROM posts 
                INNER JOIN users ON posts.user_id = users.user_id 
                WHERE posts.post_id = ?";
@@ -83,18 +83,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>.blendHub | <?php echo htmlspecialchars($post['title']); ?></title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
+
   <link rel="stylesheet" href="plugins/bootstrap/bootstrap.min.css">
   <link rel="stylesheet" href="plugins/themify-icons/themify-icons.css">
   <link rel="stylesheet" href="plugins/slick/slick.css">
 
   <link rel="stylesheet" href="css/style.css" media="screen">
+  <link rel="stylesheet" href="css/chat.css" media="screen">
 
   <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
   <link rel="icon" href="images/favicon.png" type="image/x-icon">
-  <style>
+  <meta property="og:type" content="website" />
+
+<style>
 .d-none {
-    display: none; /* Görünmez yapar */
+  display: none; /* Görünmez yapar */
 }
 .reply-btn {
     color: #007bff; /* Yanıtla butonunun rengini belirler */
@@ -108,35 +111,167 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 .media .media {
   margin-top: 20px; /* Alt yorumlar için üst boşluk */
 }
-    </style>
+</style>
 </head>
 <body>
+<header class="navigation fixed-top">
+  <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-white">
+      <a class="navbar-brand order-1" href="index.php">
+        <img class="img-fluid" width="100px" src="images/logo.png"
+          alt=".blendHub">
+      </a>
+      <div class="collapse navbar-collapse text-center order-lg-2 order-3" id="navigation">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item dropdown">
+            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false">
+              anasayfa <i class="ti-angle-down ml-1"></i>
+            </a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="index-full.html">Homepage Full Width</a>
+              
+              <a class="dropdown-item" href="index-full-left.html">Homepage Full With Left Sidebar</a>
+              
+              <a class="dropdown-item" href="index-full-right.html">Homepage Full With Right Sidebar</a>
+              
+              <a class="dropdown-item" href="index-list.html">Homepage List Style</a>
+              
+              <a class="dropdown-item" href="index-list-left.html">Homepage List With Left Sidebar</a>
+              
+              <a class="dropdown-item" href="index-list-right.html">Homepage List With Right Sidebar</a>
+              
+              <a class="dropdown-item" href="index-grid.html">Homepage Grid Style</a>
+              
+              <a class="dropdown-item" href="index-grid-left.html">Homepage Grid With Left Sidebar</a>
+              
+              <a class="dropdown-item" href="index-grid-right.html">Homepage Grid With Right Sidebar</a>
+              
+            </div>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false">
+              yazılar <i class="ti-angle-down ml-1"></i>
+            </a>
+            <div class="dropdown-menu">
+              
+              <a class="dropdown-item" href="about-me.html">About Me</a>
+              
+              <a class="dropdown-item" href="about-us.html">About Us</a>
+              
+            </div>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="contact.html">mentörler</a>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+              aria-expanded="false">hakkımızda <i class="ti-angle-down ml-1"></i>
+            </a>
+            <div class="dropdown-menu">
+              
+              <a class="dropdown-item" href="author.html">Author</a>
+              
+              <a class="dropdown-item" href="author-single.html">Author Single</a>
+
+              <a class="dropdown-item" href="advertise.html">Advertise</a>
+              
+              <a class="dropdown-item" href="post-details.html">Post Details</a>
+              
+              <a class="dropdown-item" href="post-elements.html">Post Elements</a>
+              
+              <a class="dropdown-item" href="tags.html">Tags</a>
+
+              <a class="dropdown-item" href="search-result.html">Search Result</a>
+
+              <a class="dropdown-item" href="search-not-found.html">Search Not Found</a>
+              
+              <a class="dropdown-item" href="privacy-policy.html">Privacy Policy</a>
+              
+              <a class="dropdown-item" href="terms-conditions.html">Terms Conditions</a>
+
+              <a class="dropdown-item" href="404.html">404 Page</a>
+              
+            </div>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="shop.html">yardım</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="shop.html">iletişim</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="order-2 order-lg-3 d-flex align-items-center">
+        
+        <form class="search-bar">
+          <input id="search-query" name="s" type="search" placeholder="Type &amp; Hit Enter...">
+        </form>
+        
+        <button class="navbar-toggler border-0 order-1" type="button" data-toggle="collapse" data-target="#navigation">
+          <i class="ti-menu"></i>
+        </button>
+          <?php if (isset($_SESSION['user_id'])): ?>
+        <div class="dropdown" style="margin-left: 25px;">
+            <a href="profile.php?slug=<?php echo $_SESSION['slug']; ?>" class="dropdown-toggle" id="profileDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <?php if (!empty($_SESSION['profile_picture'])): ?>
+                    <img src="data:image/jpeg;base64,<?php echo htmlspecialchars($_SESSION['profile_picture']); ?>" alt="Profil Fotoğrafı" width="40" height="40" class="rounded-circle">
+                <?php else: ?>
+                    <img src="images/dprofile.jpg" alt="Varsayılan Profil Fotoğrafı" width="40" height="40" class="rounded-circle">
+                <?php endif; ?>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
+                <a class="dropdown-item" href="profile.php?slug=<?php echo $_SESSION['slug']; ?>">Profilim</a>
+                <a class="dropdown-item" href="settings.php">Ayarlar</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="logout.php" onclick="return confirm('Çıkış yapmak istediğinize emin misiniz?');">Çıkış Yap</a>
+            </div>
+        </div>
+    <?php else: ?>
+        <a href="login.php" style="margin-left: 25px; color: green">Giriş Yap</a>
+    <?php endif; ?>
+        </div>
+      </div>
+
+    </nav>
+  </div>
+</header>
+
+<?php include 'chat-widget.html'; ?>
+
 <div class="py-4"></div>
 <section class="section">
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-lg-9 mb-5">
+      <div class=" col-lg-9   mb-5 mb-lg-0">
         <article>
           <div class="post-slider mb-4">
-            <img src="<?php echo $post['featured_image'] ? 'data:image/jpeg;base64,' . $post['featured_image'] : 'images/default_post.jpg'; ?>" class="card-img" alt="<?php echo htmlspecialchars($post['title']); ?>">
+          <img src="<?php echo $post['featured_image'] ? 'data:image/jpeg;base64,' . $post['featured_image'] : 'images/default_post.jpg'; ?>" class="card-img" alt="<?php echo htmlspecialchars($post['title']); ?>">
           </div>
           
           <h1 class="h2"><?php echo htmlspecialchars($post['title']); ?></h1>
           <ul class="card-meta my-3 list-inline">
             <li class="list-inline-item">
-              <a href="profile.php?slug=<?php echo urlencode($post['username']); ?>" class="card-meta-author">
+            <a href="profile.php?slug=<?php echo urlencode($post['slug']); ?>" class="card-meta-author">
                 <img src="<?php echo $post['profile_picture'] ? 'data:image/jpeg;base64,' . $post['profile_picture'] : 'images/dprofile.jpg'; ?>" alt="<?php echo htmlspecialchars($post['username']); ?>">
                 <span><?php echo htmlspecialchars($post['username']); ?></span>
               </a>
             </li>
-            <li class="list-inline-item"><i class="ti-timer"></i><?php echo $reading_time; ?> Min To Read</li>
             <li class="list-inline-item">
-  <i class="ti-calendar"></i>
-  <?php
-  $formatter = new IntlDateFormatter('tr_TR', IntlDateFormatter::LONG, IntlDateFormatter::NONE);
-  echo $formatter->format(new DateTime($post['created_at']));
-  ?>
-</li>
+              <i class="ti-timer"></i><?php echo $reading_time; ?> dakikada okuyabilirsiniz
+            </li>
+            <li class="list-inline-item">
+              <i class="ti-calendar"></i>
+              <?php
+                $formatter = new IntlDateFormatter('tr_TR', IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+                echo $formatter->format(new DateTime($post['created_at']));
+              ?>
+            </li>
             <li class="list-inline-item">
               <ul class="card-meta-tag list-inline">
                 <?php foreach ($categories as $category) : ?>
@@ -161,31 +296,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   foreach ($comments[$parent_id] as $comment) {
                 ?>
               <div class="media d-block d-sm-flex mb-4 pb-4">
-                  
-                  <?php if ($comment['parent_comment_id']) : ?>
+                <?php if ($comment['parent_comment_id']) : ?>
                     <img class="mr-3" src="images/post/arrow.png">
                 <?php endif; ?>
                 <a class="d-inline-block mr-2 mb-3 mb-md-0" href="profile.php?slug=<?php echo urlencode($comment['slug']); ?>">
                   <img src="<?php echo $comment['profile_picture'] ? 'data:image/jpeg;base64,' . $comment['profile_picture'] : 'images/dprofile.jpg'; ?>" class="mr-3 rounded-circle">    
                   </a>
                   <div class="media-body">
-                  <a href="profile.php?slug=<?php echo urlencode($comment['slug']); ?>" class="h4 d-inline-block mb-3">
-                        <?php echo htmlspecialchars($comment['username']); ?>
-                      </a>
+                    <a href="profile.php?slug=<?php echo urlencode($comment['slug']); ?>" class="h4 d-inline-block mb-3">
+                      <?php echo htmlspecialchars($comment['username']); ?>
+                    </a>
 
-                      <p><?php echo htmlspecialchars($comment['content']); ?></p>  
-                      <span class="text-black-800 mr-3 font-weight-600"><?php
-                $formatter = new IntlDateFormatter('tr_TR', IntlDateFormatter::LONG, IntlDateFormatter::SHORT);
-                echo $formatter->format(new DateTime($comment['created_at']));
-                ?></span>
-                <form method="POST">
-                  <button class="text-primary font-weight-600 reply-btn" type="submit" style="text-decoration: none; "data-comment-id="<?php echo $comment['comment_id']; ?>">Yanıtla</button>
-                  <div id="reply-form-<?php echo $comment['comment_id']; ?>" class="reply-form d-none">
-                      <input type="hidden" name="parent_id" value="<?php echo $comment['comment_id']; ?>">
-                      <textarea  class="form-control shadow-none" style="margin-top: 10px; margin-bottom: 20px;" name="comment" rows="2" required></textarea>
-                  </form>
-                  </div>
-                  <?php renderComments($comments, $comment['comment_id']); ?>
+                    <p><?php echo htmlspecialchars($comment['content']); ?></p>
+                      
+                    <span class="text-black-800 mr-3 font-weight-600"><?php
+                      $formatter = new IntlDateFormatter('tr_TR', IntlDateFormatter::LONG, IntlDateFormatter::SHORT);
+                      echo $formatter->format(new DateTime($comment['created_at']));
+                      ?></span>
+                      <form method="POST">
+                        <button class="text-primary font-weight-600 reply-btn" type="submit" style="text-decoration: none; "data-comment-id="<?php echo $comment['comment_id']; ?>">Yanıtla</button>
+                        <div id="reply-form-<?php echo $comment['comment_id']; ?>" class="reply-form d-none">
+                            <input type="hidden" name="parent_id" value="<?php echo $comment['comment_id']; ?>">
+                            <textarea  class="form-control shadow-none" style="margin-top: 10px; margin-bottom: 20px;" name="comment" rows="2" required></textarea>
+                        </form>
+                      </div>
+                      <?php renderComments($comments, $comment['comment_id']); ?>
                     </div>
               </div>
               <?php
@@ -195,7 +330,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               renderComments($comments);
               ?>
           </div>
-
           <div>
               <h3 class="mb-4">Yorum Yap</h3>
               <form method="POST">
@@ -204,8 +338,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                           <textarea class="form-control shadow-none" name="comment" rows="7" required></textarea>
                       </div>
                   </div>
-                  <p id="login-warning" style="color: red; display: none;">Yorum yapabilmek için <a href="login.php">giriş yapınız</a>.</p>
-                  <button id="submit-comment" class="btn btn-primary" type="submit">PAYLAŞ</button>
+                  <button class="btn btn-primary" type="submit">Paylaş</button>
               </form>
           </div>
       </div>
@@ -270,6 +403,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
   </footer>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const replyButtons = document.querySelectorAll('.reply-btn');
+        if (replyButtons.length === 0) {
+            console.error('Yanıtla butonları bulunamadı.');
+        } else {
+            console.log(`${replyButtons.length} adet Yanıtla butonu bulundu.`);
+        }
+    
+        replyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = this.getAttribute('data-comment-id');
+                const replyForm = document.getElementById(`reply-form-${commentId}`);
+                if (replyForm) {
+                    replyForm.classList.remove('d-none'); // Formu görünür yap
+                } else {
+                    console.error(`reply-form-${commentId} bulunamadı.`);
+                }
+            });
+        });
+    });
+    async function checkLoginStatus() {
+      const response = await fetch('is_logged_in.php');
+      const data = await response.json();
+    
+      const submitButton = document.getElementById('submit-comment');
+      const loginWarning = document.getElementById('login-warning');
+    
+      if (data.logged_in) {
+        // Kullanıcı giriş yapmış, buton aktif
+        submitButton.disabled = false;
+        loginWarning.style.display = 'none';
+      } else {
+        // Kullanıcı giriş yapmamış, buton devre dışı
+        submitButton.disabled = true;
+        loginWarning.style.display = 'block';
+      }
+    }
+    
+    // Sayfa yüklendiğinde giriş durumu kontrol ediliyor
+    document.addEventListener('DOMContentLoaded', checkLoginStatus);
+    </script>
 
   <!-- JS Plugins -->
   <script src="plugins/jQuery/jquery.min.js"></script>
@@ -280,49 +455,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <script src="plugins/instafeed/instafeed.min.js"></script>
 
-  <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const replyButtons = document.querySelectorAll('.reply-btn');
-    if (replyButtons.length === 0) {
-        console.error('Yanıtla butonları bulunamadı.');
-    } else {
-        console.log(`${replyButtons.length} adet Yanıtla butonu bulundu.`);
-    }
-
-    replyButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const commentId = this.getAttribute('data-comment-id');
-            const replyForm = document.getElementById(`reply-form-${commentId}`);
-            if (replyForm) {
-                replyForm.classList.remove('d-none'); // Formu görünür yap
-            } else {
-                console.error(`reply-form-${commentId} bulunamadı.`);
-            }
-        });
-    });
-});
-async function checkLoginStatus() {
-  const response = await fetch('is_logged_in.php');
-  const data = await response.json();
-
-  const submitButton = document.getElementById('submit-comment');
-  const loginWarning = document.getElementById('login-warning');
-
-  if (data.logged_in) {
-    // Kullanıcı giriş yapmış, buton aktif
-    submitButton.disabled = false;
-    loginWarning.style.display = 'none';
-  } else {
-    // Kullanıcı giriş yapmamış, buton devre dışı
-    submitButton.disabled = true;
-    loginWarning.style.display = 'block';
-  }
-}
-
-// Sayfa yüklendiğinde giriş durumu kontrol ediliyor
-document.addEventListener('DOMContentLoaded', checkLoginStatus);
-</script>
-
+  <script src="js/chat.js"></script>
   <!-- Main Script -->
   <script src="js/script.js"></script></body>
 </html>
