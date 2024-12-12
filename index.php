@@ -33,43 +33,14 @@ session_start();
       <div class="collapse navbar-collapse text-center order-lg-2 order-3" id="navigation">
         <ul class="navbar-nav mx-auto">
           <li class="nav-item dropdown">
-            <a class="nav-link" href="index.php" role="button" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false">
-              anasayfa <i class="ti-angle-down ml-1"></i>
+            <a class="nav-link" href="index.php">
+              anasayfa
             </a>
-            <div class="dropdown-menu">
-              <a class="dropdown-item" href="index-full.html">Homepage Full Width</a>
-              
-              <a class="dropdown-item" href="index-full-left.html">Homepage Full With Left Sidebar</a>
-              
-              <a class="dropdown-item" href="index-full-right.html">Homepage Full With Right Sidebar</a>
-              
-              <a class="dropdown-item" href="index-list.html">Homepage List Style</a>
-              
-              <a class="dropdown-item" href="index-list-left.html">Homepage List With Left Sidebar</a>
-              
-              <a class="dropdown-item" href="index-list-right.html">Homepage List With Right Sidebar</a>
-              
-              <a class="dropdown-item" href="index-grid.html">Homepage Grid Style</a>
-              
-              <a class="dropdown-item" href="index-grid-left.html">Homepage Grid With Left Sidebar</a>
-              
-              <a class="dropdown-item" href="index-grid-right.html">Homepage Grid With Right Sidebar</a>
-              
-            </div>
           </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false">
-              yazılar <i class="ti-angle-down ml-1"></i>
+          <li class="nav-item">
+            <a class="nav-link" href="blogs.php">
+              yazılar
             </a>
-            <div class="dropdown-menu">
-              
-              <a class="dropdown-item" href="about-me.html">About Me</a>
-              
-              <a class="dropdown-item" href="about-us.html">About Us</a>
-              
-            </div>
           </li>
 
           <li class="nav-item">
@@ -111,7 +82,7 @@ session_start();
 
       <div class="order-2 order-lg-3 d-flex align-items-center">
         
-        <form class="search-bar">
+        <form class="search-bar" method="GET" action="search-result.php">
           <input id="search-query" name="s" type="search" placeholder="Type &amp; Hit Enter...">
         </form>
         
@@ -157,7 +128,7 @@ session_start();
 
           if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
-                  echo '<li class="list-inline-item"><a href="tags.html">' . htmlspecialchars($row['name']) . '</a></li>';
+                  echo '<li class="list-inline-item"><a href="category.php?category=' . htmlspecialchars($row['name']) . '">' . htmlspecialchars($row['name']) . '</a></li>';
               }
           }
           $conn->close();
@@ -167,142 +138,7 @@ session_start();
     </div>
   </div>
 </div>
-<!--
-<section class="section pb-0">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-4 mb-5">
-        <h2 class="h5 section-title">Editors Pick</h2>
-        <article class="card">
-          <div class="post-slider slider-sm">
-            <img src="images/post/post-1.jpg" class="card-img-top" alt="post-thumb">
-          </div>
-          
-          <div class="card-body">
-            <h3 class="h4 mb-3"><a class="post-title" href="post-details.html">Use apples to give your bakes caramel and a moist texture</a></h3>
-            <ul class="card-meta list-inline">
-              <li class="list-inline-item">
-                <a href="author-single.html" class="card-meta-author">
-                  <img src="images/john-doe.jpg">
-                  <span>Charls Xaviar</span>
-                </a>
-              </li>
-              <li class="list-inline-item">
-                <i class="ti-timer"></i>2 Min To Read
-              </li>
-              <li class="list-inline-item">
-                <i class="ti-calendar"></i>14 jan, 2020
-              </li>
-              <li class="list-inline-item">
-                <ul class="card-meta-tag list-inline">
-                  <li class="list-inline-item"><a href="tags.html">Color</a></li>
-                  <li class="list-inline-item"><a href="tags.html">Recipe</a></li>
-                  <li class="list-inline-item"><a href="tags.html">Fish</a></li>
-                </ul>
-              </li>
-            </ul>
-            <p>It’s no secret that the digital industry is booming. From exciting startups to …</p>
-            <a href="post-details.html" class="btn btn-outline-primary">Read More</a>
-          </div>
-        </article>
-      </div>
-      <div class="col-lg-4 mb-5">
-        <h2 class="h5 section-title">Trending Post</h2>
-        
-        <article class="card mb-4">
-          <div class="card-body d-flex">
-            <img class="card-img-sm" src="images/post/post-3.jpg">
-            <div class="ml-3">
-              <h4><a href="post-details.html" class="post-title">Advice From a Twenty Something</a></h4>
-              <ul class="card-meta list-inline mb-0">
-                <li class="list-inline-item mb-0">
-                  <i class="ti-calendar"></i>14 jan, 2020
-                </li>
-                <li class="list-inline-item mb-0">
-                  <i class="ti-timer"></i>2 Min To Read
-                </li>
-              </ul>
-            </div>
-          </div>
-        </article>
-        
-        <article class="card mb-4">
-          <div class="card-body d-flex">
-            <img class="card-img-sm" src="images/post/post-2.jpg">
-            <div class="ml-3">
-              <h4><a href="post-details.html" class="post-title">The Design Files - Homes Minimalist</a></h4>
-              <ul class="card-meta list-inline mb-0">
-                <li class="list-inline-item mb-0">
-                  <i class="ti-calendar"></i>14 jan, 2020
-                </li>
-                <li class="list-inline-item mb-0">
-                  <i class="ti-timer"></i>2 Min To Read
-                </li>
-              </ul>
-            </div>
-          </div>
-        </article>
-        
-        <article class="card mb-4">
-          <div class="card-body d-flex">
-            <img class="card-img-sm" src="images/post/post-4.jpg">
-            <div class="ml-3">
-              <h4><a href="post-details.html" class="post-title">The Skinny Confidential</a></h4>
-              <ul class="card-meta list-inline mb-0">
-                <li class="list-inline-item mb-0">
-                  <i class="ti-calendar"></i>14 jan, 2020
-                </li>
-                <li class="list-inline-item mb-0">
-                  <i class="ti-timer"></i>2 Min To Read
-                </li>
-              </ul>
-            </div>
-          </div>
-        </article>
-      </div>
-      
-      <div class="col-lg-4 mb-5">
-        <h2 class="h5 section-title">Popular Post</h2>
-        
-        <article class="card">
-          <div class="post-slider slider-sm">
-            <img src="images/post/post-5.jpg" class="card-img-top" alt="post-thumb">
-          </div>
-          <div class="card-body">
-            <h3 class="h4 mb-3"><a class="post-title" href="post-details.html">How To Make Cupcakes and Cashmere Recipe At Home</a></h3>
-            <ul class="card-meta list-inline">
-              <li class="list-inline-item">
-                <a href="author-single.html" class="card-meta-author">
-                  <img src="images/kate-stone.jpg" alt="Kate Stone">
-                  <span>Kate Stone</span>
-                </a>
-              </li>
-              <li class="list-inline-item">
-                <i class="ti-timer"></i>2 Min To Read
-              </li>
-              <li class="list-inline-item">
-                <i class="ti-calendar"></i>14 jan, 2020
-              </li>
-              <li class="list-inline-item">
-                <ul class="card-meta-tag list-inline">
-                  <li class="list-inline-item"><a href="tags.html">City</a></li>
-                  <li class="list-inline-item"><a href="tags.html">Food</a></li>
-                  <li class="list-inline-item"><a href="tags.html">Taste</a></li>
-                </ul>
-              </li>
-            </ul>
-            <p>It’s no secret that the digital industry is booming. From exciting startups to …</p>
-            <a href="post-details.html" class="btn btn-outline-primary">Read More</a>
-          </div>
-        </article>
-      </div>
-      <div class="col-12">
-        <div class="border-bottom border-default"></div>
-      </div>
-    </div>
-  </div>
-</section>
-    -->
+
 <section class="section-sm">
   <div class="container">
     <div class="row justify-content-center">
@@ -389,7 +225,7 @@ while ($row = $result->fetch_assoc()) :
                     while ($category = $categories_result->fetch_assoc()) :
                     ?>
                         <li class="list-inline-item">
-                            <a href="categories.php?category=<?php echo urlencode($category['category_name']); ?>">
+                            <a href="category.php?category=<?php echo urlencode($category['category_name']); ?>">
                                 <?php echo htmlspecialchars($category['category_name'], ENT_QUOTES, 'UTF-8'); ?>
                             </a>
                         </li>
@@ -400,7 +236,7 @@ while ($row = $result->fetch_assoc()) :
         <p>
             <?php echo htmlspecialchars(substr($content, 0, 150), ENT_QUOTES, 'UTF-8') . '...'; ?>
         </p>
-        <a href="post-details.php?post_id=<?php echo $post_id; ?>" class="btn btn-outline-primary">Read More</a>
+        <a href="post-details.php?post_id=<?php echo $post_id; ?>" class="btn btn-outline-primary">Devamını Oku</a>
     </div>
 </article>
 <?php endwhile; ?>
@@ -410,7 +246,7 @@ while ($row = $result->fetch_assoc()) :
 
 <div class="widget">
   <h4 class="widget-title"><span>BLOG PAYLAŞ!</span></h4> 
-    <button type="submit" id="addPostBtn" class="btn btn-primary btn-block" name="post-share" data-toggle="modal" data-target="#addPostModal">Blog Paylaş</button>
+    <button type="submit" id="addPostBtn" class="btn btn-primary btn-block" name="post-share" data-toggle="modal" data-target="#addPostModal">Paylaş</button>
 </div>
 <div id="addPostModal" class="modal" tabindex="-1" role="dialog" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">
   <div class="modal-dialog modal-dialog-centered" role="document" style="border-radius: 8px;">
@@ -539,7 +375,7 @@ while ($row = $result->fetch_assoc()) :
           if ($categories->num_rows > 0) {
               while ($row = $categories->fetch_assoc()) {
                   echo '<li>';
-                  echo '<a href="tags.html" class="d-flex">';
+                  echo '<a href="category.php?category=' . htmlspecialchars($row['category_name']) . '" class="d-flex">';
                   echo htmlspecialchars($row['category_name']);
                   echo ' <small class="ml-auto">(' . $row['blog_count'] . ')</small>';
                   echo '</a>';
@@ -562,24 +398,6 @@ while ($row = $result->fetch_assoc()) :
 </section>
 
 <footer class="footer">
-  <!--
-  <div class="instafeed text-center mb-5">
-      <h2 class="h3 mb-4">INSTAGRAM POST</h2>
-      
-      <div class="instagram-slider">
-        <div class="instagram-post"><img src="images/instagram/1.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/2.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/4.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/3.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/2.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/1.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/3.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/4.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/2.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/4.jpg"></div>
-      </div>
-  </div>
-    -->
   <div class="container">
       <div class="row align-items-center">
       <div class="col-md-5 text-center text-md-left mb-4">

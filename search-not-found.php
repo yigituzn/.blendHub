@@ -1,3 +1,10 @@
+<?php
+session_start();
+
+if (empty($_GET['s'])) {
+    die("Lütfen bir arama terimi girin.");
+}
+?>
 <!DOCTYPE html>
 <html lang="tr-TR"><head>
   <meta charset="utf-8">
@@ -113,15 +120,15 @@
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-lg-10 mb-4">
-        <h1 class="h2 mb-4">Search results for 
-          <mark>
-            ksdbkhdv hgdfhd
-          </mark>
+        <h1 class="h2 mb-4">Arama sonuçları:
+        <mark>
+            <?php echo htmlspecialchars($_GET['s'] ?? ''); ?>
+        </mark>
         </h1>
       </div>
       <div class="col-lg-10 text-center">
         <img class="mb-5" src="images/no-search-found.svg" alt="">
-        <h3>No Search Found</h3>
+        <h3>Hiçbir Sonuç Bulunamadı</h3>
       </div>
     </div>
   </div>

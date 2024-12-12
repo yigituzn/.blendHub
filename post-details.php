@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="collapse navbar-collapse text-center order-lg-2 order-3" id="navigation">
         <ul class="navbar-nav mx-auto">
           <li class="nav-item dropdown">
-            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+            <a class="nav-link" href="index.php" role="button" data-toggle="dropdown" aria-haspopup="true"
               aria-expanded="false">
               anasayfa <i class="ti-angle-down ml-1"></i>
             </a>
@@ -164,11 +164,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="contact.html">mentörler</a>
+            <a class="nav-link" href="mentors.php">mentörler</a>
           </li>
 
           <li class="nav-item dropdown">
-            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+            <a class="nav-link" href="about.php" role="button" data-toggle="dropdown" aria-haspopup="true"
               aria-expanded="false">hakkımızda <i class="ti-angle-down ml-1"></i>
             </a>
             <div class="dropdown-menu">
@@ -196,13 +196,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <a class="dropdown-item" href="404.html">404 Page</a>
               
             </div>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link" href="shop.html">yardım</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="shop.html">iletişim</a>
           </li>
         </ul>
       </div>
@@ -275,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <li class="list-inline-item">
               <ul class="card-meta-tag list-inline">
                 <?php foreach ($categories as $category) : ?>
-                  <li class="list-inline-item"><a href="categories.php?category=<?php echo urlencode($category); ?>"><?php echo htmlspecialchars($category); ?></a></li>
+                  <li class="list-inline-item"><a href="category.php?category=<?php echo urlencode($category); ?>"><?php echo htmlspecialchars($category); ?></a></li>
                 <?php endforeach; ?>
               </ul>
             </li>
@@ -348,27 +341,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </section>
 
 <footer class="footer">
-  <svg class="footer-border" height="214" viewBox="0 0 2204 214" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M2203 213C2136.58 157.994 1942.77 -33.1996 1633.1 53.0486C1414.13 114.038 1200.92 188.208 967.765 118.127C820.12 73.7483 263.977 -143.754 0.999958 158.899"
-      stroke-width="2" />
-  </svg>
-  
-  <div class="instafeed text-center mb-5">
-      <h2 class="h3 mb-4">INSTAGRAM POST</h2>
-      
-      <div class="instagram-slider">
-        <div class="instagram-post"><img src="images/instagram/1.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/2.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/4.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/3.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/2.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/1.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/3.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/4.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/2.jpg"></div>
-        <div class="instagram-post"><img src="images/instagram/4.jpg"></div>
-      </div>
-  </div>
   
   <div class="container">
       <div class="row align-items-center">

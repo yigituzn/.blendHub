@@ -1,16 +1,19 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="tr-TR"><head>
   <meta charset="utf-8">
-  <title>.blendHub | Mentörler</title>
+  <title>.blendHub | Bloglar</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
+
   <link rel="stylesheet" href="plugins/bootstrap/bootstrap.min.css">
   <link rel="stylesheet" href="plugins/themify-icons/themify-icons.css">
   <link rel="stylesheet" href="plugins/slick/slick.css">
 
   <link rel="stylesheet" href="css/style.css" media="screen">
-
+  <link rel="stylesheet" href="css/chat.css" media="screen">
   <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
   <link rel="icon" href="images/favicon.png" type="image/x-icon">
 </head>
@@ -25,7 +28,7 @@
       <div class="collapse navbar-collapse text-center order-lg-2 order-3" id="navigation">
         <ul class="navbar-nav mx-auto">
           <li class="nav-item dropdown">
-            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+            <a class="nav-link" href="index.php" role="button" data-toggle="dropdown" aria-haspopup="true"
               aria-expanded="false">
               anasayfa <i class="ti-angle-down ml-1"></i>
             </a>
@@ -51,7 +54,7 @@
             </div>
           </li>
           <li class="nav-item dropdown">
-            <a class="nav-link" href="blogs.php" role="button" data-toggle="dropdown" aria-haspopup="true"
+            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
               aria-expanded="false">
               yazılar <i class="ti-angle-down ml-1"></i>
             </a>
@@ -135,92 +138,137 @@
     </nav>
   </div>
 </header>
-<div class="text-center">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-9 mx-auto" style="margin-top: 150px">
-        <h1 class="mb-4">Mentörler</h1>
-        <ul class="list-inline">
-          <li class="list-inline-item"><a class="text-default" href="index.php">Anasayfa
-              &nbsp; &nbsp; /</a></li>
-          <li class="list-inline-item text-primary">Mentörler</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
+
+<div class="py-3"></div>
+
 <?php
 include 'db_connection.php';
 
-$sql = "
-SELECT 
-    u.user_id, 
-    u.username, 
-    u.profile_picture, 
-    u.slug,
-    u.created_at,
-    ma.expertise, 
-    COUNT(p.post_id) AS post_count 
-FROM 
-    users u
-LEFT JOIN 
-    mentorshipapplications ma ON u.email = ma.email
-LEFT JOIN 
-    posts p ON u.user_id = p.user_id
-WHERE 
-    u.role = 'mentor'
-GROUP BY 
-    u.user_id
-";
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$blogs_per_page = 5;
+$offset = ($page - 1) * $blogs_per_page;
 
-$result = $conn->query($sql);
+// Blog sorgusu
+$query = "SELECT posts.*, users.username, users.slug, users.profile_picture 
+          FROM posts 
+          INNER JOIN users ON posts.user_id = users.user_id 
+          WHERE posts.status = 'published' 
+          ORDER BY posts.created_at DESC 
+          LIMIT $blogs_per_page OFFSET $offset";
+$result = $conn->query($query);
 
-// HTML çıktı
-if ($result->num_rows > 0) {
-    echo '<section class="section-sm">';
-    echo '<div class="container">';
-    echo '<div class="row no-gutters">';
+// Toplam blog sayısını hesapla
+$count_query = "SELECT COUNT(*) AS total_blogs FROM posts WHERE status = 'published'";
+$count_result = $conn->query($count_query);
+$total_blogs = $count_result->fetch_assoc()['total_blogs'];
+$total_pages = ceil($total_blogs / $blogs_per_page);
 
-    while ($row = $result->fetch_assoc()) {
-        $profile_picture = !empty($row['profile_picture']) ? 'data:image/png;base64,' . $row['profile_picture'] : 'images/dprofile.jpg';
-        $username = htmlspecialchars($row['username']);
-        $expertise = htmlspecialchars($row['expertise'] ?? '');
-        $post_count = intval($row['post_count']);
+setlocale(LC_TIME, 'tr_TR.UTF-8', 'turkish');
 
-        $created_at = new DateTime($row['created_at']);
-        $current_date = new DateTime();
-        $interval = $created_at->diff($current_date);
-        if ($interval->y > 0) {
-            $membership_duration = $interval->y . " yıl";
-            if ($interval->m > 0) {
-                $membership_duration .= " " . $interval->m . " ay";
-            }
-        } elseif ($interval->m > 0) {
-            $membership_duration = $interval->m . " ay";
-        } else {
-            $membership_duration = $interval->d . " gün";
-        }
+// Fonksiyon: Okuma süresi hesaplama
+function calculateReadingTime($content, $words_per_minute = 200) {
+    $cleaned_content = strip_tags($content);
+    $cleaned_content = preg_replace('/[^\w\s]/u', '', $cleaned_content); // Noktalama işaretlerini kaldır
+    $cleaned_content = trim(preg_replace('/\s+/', ' ', $cleaned_content)); // Çoklu boşlukları temizle
+    $word_count = str_word_count($cleaned_content);
 
-        echo '<div class="col-lg-4 col-sm-6 author-block">';
-        echo '<div class="author-card text-center">';
-        echo '<img class="author-image" src="' . $profile_picture . '">';
-        echo '<h3 class="mb-2"><a href="profile.php?slug=' . urlencode($row['slug']) . '" class="post-title">' . $username . '</a></h3>';
-        echo '<p class="mb-3">' . $expertise . '</p>';
-        echo '<p>Şu tarihten itibaren üye: ' . $membership_duration . '</p>';
-        echo '<a class="post-count" href="author-single.html#post"><i class="ti-pencil-alt mr-2"></i><span class="text-primary">' . $post_count . '</span> Gönderi</a>';
-        echo '</div>';
-        echo '</div>';
+    if ($word_count === 0) {
+        return 1; // Minimum okuma süresi
     }
 
-    echo '</div>';
-    echo '</div>';
-    echo '</section>';
-} else {
-    echo "Hiç mentor bulunamadı.";
+    return ceil($word_count / $words_per_minute);
 }
-
-$conn->close();
 ?>
+
+<section class="section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <?php while ($row = $result->fetch_assoc()) : ?>
+          <article class="card mb-4">
+            <div class="row card-body">
+              <?php if (!empty($row['featured_image'])): ?>
+                <div class="col-md-4 mb-4 mb-md-0">
+                  <div class="post-slider slider-sm">
+                    <img src="data:image/jpeg;base64,<?php echo $row['featured_image']; ?>" class="card-img" alt="<?php echo htmlspecialchars($row['title'], ENT_QUOTES, 'UTF-8'); ?>" style="height:200px; object-fit: cover;">
+                  </div>
+                </div>
+                <div class="col-md-8">
+              <?php else: ?>
+                <div class="col-12">
+              <?php endif; ?>
+                <h3 class="h4 mb-3"><a class="post-title" href="post-details.php?post_id=<?php echo $row['post_id']; ?>"><?php echo htmlspecialchars($row['title'], ENT_QUOTES, 'UTF-8'); ?></a></h3>
+                <ul class="card-meta list-inline">
+                  <li class="list-inline-item">
+                    <a href="profile.php?slug=<?php echo htmlspecialchars($row['slug'], ENT_QUOTES, 'UTF-8'); ?>" class="card-meta-author">
+                      <img src="<?php echo !empty($row['profile_picture']) ? 'data:image/png;base64,' . $row['profile_picture'] : 'images/dprofile.jpg'; ?>" alt="<?php echo htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8'); ?>">
+                      <span><?php echo htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    </a>
+                  </li>
+                  <li class="list-inline-item">
+                    <i class="ti-timer"></i> <?php echo calculateReadingTime($row['content']); ?> dk. okunabilir
+                  </li>
+                  <li class="list-inline-item">
+                    <i class="ti-calendar"></i> <?php 
+                      $tarih = $row['created_at'];
+                      $date = new DateTime($tarih);
+                      $formatter = new IntlDateFormatter('tr_TR', IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+                      echo $formatter->format($date); 
+                    ?>
+                  </li>
+                  <li class="list-inline-item">
+                    <ul class="card-meta-tag list-inline">
+                      <?php
+                        $category_query = "SELECT categories.name AS category_name 
+                                           FROM postcategories 
+                                           JOIN categories ON postcategories.category_id = categories.category_id 
+                                           WHERE postcategories.post_id = ?";
+                        $category_stmt = $conn->prepare($category_query);
+                        $category_stmt->bind_param("i", $row['post_id']);
+                        $category_stmt->execute();
+                        $categories_result = $category_stmt->get_result();
+
+                        while ($category = $categories_result->fetch_assoc()) :
+                      ?>
+                        <li class="list-inline-item">
+                          <a href="categories.php?category=<?php echo urlencode($category['category_name']); ?>">
+                            <?php echo htmlspecialchars($category['category_name'], ENT_QUOTES, 'UTF-8'); ?>
+                          </a>
+                        </li>
+                      <?php endwhile; ?>
+                    </ul>
+                  </li>
+                </ul>
+                <p><?php echo htmlspecialchars(substr($row['content'], 0, 150), ENT_QUOTES, 'UTF-8') . '...'; ?></p>
+                <a href="post-details.php?post_id=<?php echo $row['post_id']; ?>" class="btn btn-outline-primary">Read More</a>
+              </div>
+            </div>
+          </article>
+        <?php endwhile; ?>
+      </div>
+    </div>
+  </div>
+</section>
+
+<ul class="pagination justify-content-center">
+    <?php if ($page > 1): ?>
+        <li class="page-item">
+            <a href="?page=<?php echo $page - 1; ?>" class="page-link">&laquo;</a>
+        </li>
+    <?php endif; ?>
+
+    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+        <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
+            <a href="?page=<?php echo $i; ?>" class="page-link"><?php echo $i; ?></a>
+        </li>
+    <?php endfor; ?>
+
+    <?php if ($page < $total_pages): ?>
+        <li class="page-item">
+            <a href="?page=<?php echo $page + 1; ?>" class="page-link">&raquo;</a>
+        </li>
+    <?php endif; ?>
+</ul>
 
 <footer class="footer">
   
@@ -265,5 +313,7 @@ $conn->close();
 
   <script src="plugins/instafeed/instafeed.min.js"></script>
 
-  <script src="js/script.js"></script></body>
+  <script src="js/script.js"></script>
+
+  <script src="js/chat.js"></script></body>
 </html>
