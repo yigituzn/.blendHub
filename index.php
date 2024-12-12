@@ -1,18 +1,5 @@
 <?php
 session_start();
-//include 'header.php';
-include 'db_connection.php';
-
-$sql = "SELECT username, slug, profile_picture FROM users ORDER BY created_at DESC LIMIT 3";
-$result = $conn->query($sql);
-
-$authors = [];
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $authors[] = $row; // Kullanıcıları diziye ekle
-    }
-}
-$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="tr-TR"><head>
@@ -46,7 +33,7 @@ $conn->close();
       <div class="collapse navbar-collapse text-center order-lg-2 order-3" id="navigation">
         <ul class="navbar-nav mx-auto">
           <li class="nav-item dropdown">
-            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+            <a class="nav-link" href="index.php" role="button" data-toggle="dropdown" aria-haspopup="true"
               aria-expanded="false">
               anasayfa <i class="ti-angle-down ml-1"></i>
             </a>
@@ -86,11 +73,11 @@ $conn->close();
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="contact.html">mentörler</a>
+            <a class="nav-link" href="mentors.php">mentörler</a>
           </li>
 
           <li class="nav-item dropdown">
-            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+            <a class="nav-link" href="about.php" role="button" data-toggle="dropdown" aria-haspopup="true"
               aria-expanded="false">hakkımızda <i class="ti-angle-down ml-1"></i>
             </a>
             <div class="dropdown-menu">
@@ -118,13 +105,6 @@ $conn->close();
               <a class="dropdown-item" href="404.html">404 Page</a>
               
             </div>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link" href="shop.html">yardım</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="shop.html">iletişim</a>
           </li>
         </ul>
       </div>
@@ -164,78 +144,28 @@ $conn->close();
   </div>
 </header>
 <?php include 'chat-widget.html'; ?>
-<div class="banner text-center">
+<div class="text-center">
   <div class="container">
     <div class="row">
-      <div class="col-lg-9 mx-auto">
-        <h1 class="mb-5">Would You <br> Like To Read Today?</h1>
+      <div class="col-lg-9 mx-auto" style="margin-top: 150px">
+        <h1 class="mb-5">Bugün Ne <br>Modelleyeceksiniz?</h1>
         <ul class="list-inline widget-list-inline">
-          <li class="list-inline-item"><a href="tags.html">City</a></li>
-          <li class="list-inline-item"><a href="tags.html">Color</a></li>
-          <li class="list-inline-item"><a href="tags.html">Creative</a></li>
-          <li class="list-inline-item"><a href="tags.html">Decorate</a></li>
-          <li class="list-inline-item"><a href="tags.html">Demo</a></li>
-          <li class="list-inline-item"><a href="tags.html">Elements</a></li>
-          <li class="list-inline-item"><a href="tags.html">Fish</a></li>
-          <li class="list-inline-item"><a href="tags.html">Food</a></li>
-          <li class="list-inline-item"><a href="tags.html">Nice</a></li>
-          <li class="list-inline-item"><a href="tags.html">Recipe</a></li>
-          <li class="list-inline-item"><a href="tags.html">Season</a></li>
-          <li class="list-inline-item"><a href="tags.html">Taste</a></li>
-          <li class="list-inline-item"><a href="tags.html">Tasty</a></li>
-          <li class="list-inline-item"><a href="tags.html">Vlog</a></li>
-          <li class="list-inline-item"><a href="tags.html">Wow</a></li>
+          <?php
+          include 'db_connection.php';
+          $sql = "SELECT name FROM categories";
+          $result = $conn->query($sql);
+
+          if ($result->num_rows > 0) {
+              while ($row = $result->fetch_assoc()) {
+                  echo '<li class="list-inline-item"><a href="tags.html">' . htmlspecialchars($row['name']) . '</a></li>';
+              }
+          }
+          $conn->close();
+          ?>
         </ul>
       </div>
     </div>
   </div>
-
-  
-  <svg class="banner-shape-1" width="39" height="40" viewBox="0 0 39 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0.965848 20.6397L0.943848 38.3906L18.6947 38.4126L18.7167 20.6617L0.965848 20.6397Z" stroke="#040306"
-      stroke-miterlimit="10" />
-    <path class="path" d="M10.4966 11.1283L10.4746 28.8792L28.2255 28.9012L28.2475 11.1503L10.4966 11.1283Z" />
-    <path d="M20.0078 1.62949L19.9858 19.3804L37.7367 19.4024L37.7587 1.65149L20.0078 1.62949Z" stroke="#040306"
-      stroke-miterlimit="10" />
-  </svg>
-  
-  <svg class="banner-shape-2" width="39" height="39" viewBox="0 0 39 39" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g filter="url(#filter0_d)">
-      <path class="path"
-        d="M24.1587 21.5623C30.02 21.3764 34.6209 16.4742 34.435 10.6128C34.2491 4.75147 29.3468 0.1506 23.4855 0.336498C17.6241 0.522396 13.0233 5.42466 13.2092 11.286C13.3951 17.1474 18.2973 21.7482 24.1587 21.5623Z" />
-      <path
-        d="M5.64626 20.0297C11.1568 19.9267 15.7407 24.2062 16.0362 29.6855L24.631 29.4616L24.1476 10.8081L5.41797 11.296L5.64626 20.0297Z"
-        stroke="#040306" stroke-miterlimit="10" />
-    </g>
-    <defs>
-      <filter id="filter0_d" x="0.905273" y="0" width="37.8663" height="38.1979" filterUnits="userSpaceOnUse"
-        color-interpolation-filters="sRGB">
-        <feFlood flood-opacity="0" result="BackgroundImageFix" />
-        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
-        <feOffset dy="4" />
-        <feGaussianBlur stdDeviation="2" />
-        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" />
-        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow" />
-        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape" />
-      </filter>
-    </defs>
-  </svg>
-
-  
-  <svg class="banner-shape-3" width="39" height="40" viewBox="0 0 39 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0.965848 20.6397L0.943848 38.3906L18.6947 38.4126L18.7167 20.6617L0.965848 20.6397Z" stroke="#040306"
-      stroke-miterlimit="10" />
-    <path class="path" d="M10.4966 11.1283L10.4746 28.8792L28.2255 28.9012L28.2475 11.1503L10.4966 11.1283Z" />
-    <path d="M20.0078 1.62949L19.9858 19.3804L37.7367 19.4024L37.7587 1.65149L20.0078 1.62949Z" stroke="#040306"
-      stroke-miterlimit="10" />
-  </svg>
-
-  
-  <svg class="banner-border" height="240" viewBox="0 0 2202 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M1 123.043C67.2858 167.865 259.022 257.325 549.762 188.784C764.181 125.427 967.75 112.601 1200.42 169.707C1347.76 205.869 1901.91 374.562 2201 1"
-      stroke-width="2" />
-  </svg>
 </div>
 <!--
 <section class="section pb-0">
@@ -538,9 +468,22 @@ while ($row = $result->fetch_assoc()) :
                 <input type="text" id="fullName" name="fullName" class="form-control" required>
             </div>
             <div class="form-group">
-                <label for="email">E-posta</label>
-                <input type="email" id="email" name="email" class="form-control" required>
-            </div>
+              <label for="email">E-posta</label>
+              <input 
+                  type="email" 
+                  id="email" 
+                  name="email" 
+                  class="form-control" 
+                  value="<?php if (isset($_SESSION['user_email'])) {
+                      $user_email = $_SESSION['user_email']; // Oturumdan e-posta al
+                  } else {
+                      $user_email = ''; // Kullanıcı giriş yapmamışsa boş bırak
+                  }
+                  echo htmlspecialchars($user_email); ?>" 
+                  readonly 
+                  required
+              >
+          </div>
             <div class="form-group">
                 <label for="expertise">Uzmanlık Alanı</label>
                 <input type="text" id="expertise" name="expertise" class="form-control" required>
@@ -619,11 +562,7 @@ while ($row = $result->fetch_assoc()) :
 </section>
 
 <footer class="footer">
-  <svg class="footer-border" height="214" viewBox="0 0 2204 214" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M2203 213C2136.58 157.994 1942.77 -33.1996 1633.1 53.0486C1414.13 114.038 1200.92 188.208 967.765 118.127C820.12 73.7483 263.977 -143.754 0.999958 158.899"
-      stroke-width="2" />
-  </svg>
-  
+  <!--
   <div class="instafeed text-center mb-5">
       <h2 class="h3 mb-4">INSTAGRAM POST</h2>
       
@@ -640,7 +579,7 @@ while ($row = $result->fetch_assoc()) :
         <div class="instagram-post"><img src="images/instagram/4.jpg"></div>
       </div>
   </div>
-  
+    -->
   <div class="container">
       <div class="row align-items-center">
       <div class="col-md-5 text-center text-md-left mb-4">

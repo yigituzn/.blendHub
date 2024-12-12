@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['username'] = $username;
             $_SESSION['slug'] = $slug; // Slug bilgisini oturuma ekle
             $_SESSION['profile_picture'] = $profile_picture; // Profil fotoğrafını oturuma ekle
-
+            $_SESSION['user_email'] = $_POST['email'];
             // Giriş başarılı, yönlendir
             echo "<script>alert('Giriş başarılı!'); window.location.href = 'index.php';</script>";
             exit; // İşlemi sonlandır
