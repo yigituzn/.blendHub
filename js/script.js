@@ -127,7 +127,7 @@ $(window).on('load', function () {
 
 })(jQuery);
 
-document.getElementById('addPostForm').addEventListener('submit', function(event) {
+document.getElementById('blog-form').addEventListener('submit', function(event) {
 	const fileInput = document.getElementById('featuredImage');
 	const file = fileInput.files[0];
 

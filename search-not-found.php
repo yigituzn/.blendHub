@@ -4,6 +4,48 @@ session_start();
 if (empty($_GET['s'])) {
     die("Lütfen bir arama terimi girin.");
 }
+
+function getGoogleSearchResults($query) {
+  $api_key = 'AIzaSyDq_byUpj_4V3Ef78WKdXECunGNE3Srb1I'; // Google API Anahtarınız
+  $cx = '20f48ef3b267743a2'; // Custom Search Engine ID
+  $url = "https://www.googleapis.com/customsearch/v1?q=" . urlencode($query) . "&key=" . $api_key . "&cx=" . $cx;
+
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // SSL doğrulamayı devre dışı bırak
+  $response = curl_exec($ch);
+
+  if (curl_errno($ch)) {
+      die("cURL Hatası: " . curl_error($ch));
+  }
+
+  curl_close($ch);
+
+  if (!$response) {
+      die("Google API'den yanıt alınamadı.");
+  }
+
+  $data = json_decode($response, true);
+
+  if (isset($data['error'])) {
+      die("Google API Hatası: " . $data['error']['message']);
+  }
+
+  return $data;
+}
+
+if (isset($_GET['s']) && !empty($_GET['s'])) {
+  $search_query = $_GET['s'];
+  $google_results = getGoogleSearchResults($search_query);
+
+  if (isset($google_results['items']) && !empty($google_results['items'])) {
+      $results = $google_results['items'];
+  } else {
+      $results = [];
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="tr-TR"><head>
@@ -116,22 +158,34 @@ if (empty($_GET['s'])) {
 
 <div class="py-3"></div>
 
+<!--<script async src="https://cse.google.com/cse.js?cx=20f48ef3b267743a2">
+</script>
+<div class="gcse-search"></div>-->
 <section class="section">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-10 mb-4">
-        <h1 class="h2 mb-4">Arama sonuçları:
-        <mark>
-            <?php echo htmlspecialchars($_GET['s'] ?? ''); ?>
-        </mark>
-        </h1>
-      </div>
-      <div class="col-lg-10 text-center">
-        <img class="mb-5" src="images/no-search-found.svg" alt="">
-        <h3>Hiçbir Sonuç Bulunamadı</h3>
-      </div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 mb-4">
+                <h1 class="h2 mb-4">Sonuç bulunamadı</h1>
+                <p>Ancak aşağıda ilgili Google sonuçlarını bulabilirsiniz:</p>
+            </div>
+            <div class="col-lg-10">
+                <?php if (!empty($results)): ?>
+                    <ul class="list-group">
+                        <?php foreach ($results as $item): ?>
+                            <li class="list-group-item">
+                                <a href="<?php echo htmlspecialchars($item['link']); ?>" target="_blank">
+                                    <h5><?php echo htmlspecialchars($item['title']); ?></h5>
+                                </a>
+                                <p><?php echo htmlspecialchars($item['snippet']); ?></p>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php else: ?>
+                    <p>Google'da bu arama için de sonuç bulunamadı.</p>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
-  </div>
 </section>
 
 <footer class="footer">

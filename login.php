@@ -41,6 +41,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
 }
 $conn->close();
+
+if (isset($_SESSION['user_id'])) {
+  header('Location: index.php');
+  exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="tr-TR">

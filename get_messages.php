@@ -1,6 +1,6 @@
 <?php
 session_start();
-$conn = new mysqli('localhost', 'root', '', 'blendhub');
+include 'db_connection.php';
 $currentUser = $_SESSION['user_id']; // Giriş yapan kullanıcı ID'si
 $mentorId = $_GET['mentorId']; // Sohbet yapılan kişi ID'si
 

@@ -1,6 +1,6 @@
 <?php
 session_start();
-$conn = new mysqli('localhost', 'root', '', 'blendhub');
+include 'db_connection.php';
 $currentUser = $_SESSION['user_id'];
 
 // Kullanıcı rolünü al

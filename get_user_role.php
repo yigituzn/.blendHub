@@ -1,6 +1,6 @@
 <?php
 session_start();
-$conn = new mysqli('localhost', 'root', '', 'blendhub');
+include 'db_connection.php';
 $currentUser = $_SESSION['user_id'];
 
 $result = $conn->query("SELECT role FROM users WHERE user_id = $currentUser");
