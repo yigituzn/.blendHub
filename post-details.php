@@ -1,6 +1,5 @@
 <?php
 session_start();
-//include 'header.php';
 include 'db_connection.php';
 
 // Gelen post_id parametresini alın
@@ -24,6 +23,16 @@ if ($post_result->num_rows === 0) {
 }
 
 $post = $post_result->fetch_assoc();
+
+$image_query = "SELECT image_data, position FROM post_images WHERE post_id = ? ORDER BY position ASC";
+$image_stmt = $conn->prepare($image_query);
+$image_stmt->bind_param("i", $post_id);
+$image_stmt->execute();
+$image_result = $image_stmt->get_result();
+$images = [];
+while ($row = $image_result->fetch_assoc()) {
+    $images[$row['position']] = $row['image_data'];
+}
 
 // Kategorileri çek
 $category_query = "SELECT categories.name FROM postcategories 
@@ -75,6 +84,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $insert_stmt->close();
         echo "<script>alert('Yorumunuz incelenmek üzere gönderildi.'); window.location.href = 'post-details.php?post_id=$post_id';</script>";
     }
+}
+
+function renderPostWithImages($content, $images) {
+  $content_parts = explode("[img]", $content); // İçerikte [img] ile ayrılmış bölümleri ayırıyoruz
+  $html = "";
+
+  foreach ($content_parts as $index => $part) {
+      $html .= "<p>" . nl2br(htmlspecialchars($part)) . "</p>";
+      if (isset($images[$index + 1])) { // Görseller sıraya göre
+          $html .= '<img src="data:image/jpeg;base64,' . base64_encode($images[$index + 1]) . '" style="max-width:100%; margin: 10px 0;">';
+      }
+  }
+
+  return $html;
 }
 ?>
 <!DOCTYPE html>
@@ -274,7 +297,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </li>
           </ul>
           <div class="content">
-            <p><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
+            <p><?php echo $post['content'] ?></p>
           </div>
         </article>
         

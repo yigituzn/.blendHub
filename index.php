@@ -17,7 +17,6 @@ session_start();
 
   <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
   <link rel="icon" href="images/favicon.png" type="image/x-icon">
-  <link rel="stylesheet" href="css/profilephoto.css">
   <style>
 
     </style>
@@ -181,10 +180,18 @@ while ($row = $result->fetch_assoc()) :
 ?>
 <article class="card mb-4">
     <div class="post-slider">
-    <?php if (!empty($row['featured_image'])) : ?>
-      <img src="data:image/jpeg;base64,<?php echo $row['featured_image']; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($row['title'], ENT_QUOTES, 'UTF-8'); ?>">
-    <?php endif; ?>
+    <?php
+    preg_match_all('/<img[^>]+src="([^">]+)"/', $row['content'], $matches);
 
+    if (!empty($matches[1])) :
+        foreach ($matches[1] as $img_src) :
+    ?>
+            <div>
+                <img src="<?php echo htmlspecialchars($img_src, ENT_QUOTES, 'UTF-8'); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($row['title'], ENT_QUOTES, 'UTF-8'); ?>">
+            </div>
+    <?php 
+        endforeach;
+    endif; ?>
     </div>
     <div class="card-body">
         <h3 class="mb-3">
@@ -234,7 +241,7 @@ while ($row = $result->fetch_assoc()) :
             </li>
         </ul>
         <p>
-            <?php echo htmlspecialchars(substr($content, 0, 150), ENT_QUOTES, 'UTF-8') . '...'; ?>
+        <?php echo substr(strip_tags($content), 0, 150) . '...'; ?>
         </p>
         <a href="post-details.php?post_id=<?php echo $post_id; ?>" class="btn btn-outline-primary">Devamını Oku</a>
     </div>
@@ -248,8 +255,8 @@ while ($row = $result->fetch_assoc()) :
   <h4 class="widget-title"><span>BLOG PAYLAŞ!</span></h4> 
     <button type="submit" id="addPostBtn" class="btn btn-primary btn-block" name="post-share" data-toggle="modal" data-target="#addPostModal">Paylaş</button>
 </div>
-<div id="addPostModal" class="modal" tabindex="-1" role="dialog" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">
-  <div class="modal-dialog modal-dialog-centered" role="document" style="border-radius: 8px;">
+<div id="addPostModal" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Yeni Blog Gönderisi</h5>
@@ -258,6 +265,26 @@ while ($row = $result->fetch_assoc()) :
         </button>
       </div>
       <form id="blog-form" method="POST" action="add_post.php" enctype="multipart/form-data">
+      <div class="modal-body">
+          <div class="form-group">
+              <label for="postTitle">Başlık</label>
+              <input type="text" class="form-control" id="postTitle" name="title" required>
+          </div>
+          <div class="form-group">
+              <label for="postContent">İçerik</label>
+              <textarea id="postContent" name="content" rows="10"></textarea>
+          </div>
+      </div>
+      <div class="modal-footer">
+      <p id="mentor-login-warning" style="color: red; display: none;">
+                Blog paylaşabilmek için <a href="login.php">giriş yapınız.</a>
+            </p>
+          <button type="submit" class="btn btn-primary">Paylaş</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+      </div>
+  </form>
+      <!--
+      <form id="blog-form" method="POST" action="add_post.php" enctype="multipart/form-data">
         <div class="modal-body">
           <div class="form-group">
             <label for="postTitle">Başlık</label>
@@ -265,22 +292,15 @@ while ($row = $result->fetch_assoc()) :
           </div>
           <div class="form-group">
             <label for="postContent">İçerik</label>
-            <textarea class="form-control" id="postContent" name="content" rows="5" required></textarea>
+            <textarea class="form-control" id="postContent" name="content" rows="10" required></textarea>
           </div>
-          <div class="form-group">
-            <label for="featuredImage">Öne Çıkan Resim</label>
-            <input type="file" class="form-control-file" id="featuredImage" name="featured_image" accept=".jpg,.jpeg,.png">
-            <small class="form-text text-muted">Sadece JPG ve PNG formatında, maksimum 5MB.</small>
-          </div>
-          <p id="blog-login-warning" style="color: red; display: none;">
-            Blog ekleyebilmek için <a href="login.php">giriş yapınız.</a>
-          </p>
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">Paylaş</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
         </div>
       </form>
+      -->
     </div>
   </div>
 </div>
@@ -335,27 +355,6 @@ while ($row = $result->fetch_assoc()) :
   </div>
 </div>
 
-  <!--<div class="widget widget-author">
-    <h4 class="widget-title">Authors</h4>
-    <?php foreach ($authors as $author): ?>
-        <div class="media align-items-center">
-            <div class="mr-3">
-                <img class="widget-author-image" 
-                     src="<?php echo !empty($author['profile_picture']) ? 'data:image/png;base64,' . $author['profile_picture'] : 'images/dprofile.jpg'; ?>" 
-                     alt="<?php echo htmlspecialchars($author['username']); ?>">
-            </div>
-            <div class="media-body">
-                <h5 class="mb-1">
-                    <a class="post-title" href="profile.php?slug=<?php echo urlencode($author['slug']); ?>">
-                        <?php echo htmlspecialchars($author['username']); ?>
-                    </a>
-                </h5>
-                <span>Author &amp; Developer</span>
-            </div>
-        </div>
-    <?php endforeach; ?>
-  </div>
-    -->
   <div class="widget widget-categories">
     <h4 class="widget-title"><span>Kategoriler</span></h4>
     <ul class="list-unstyled widget-list">
@@ -431,53 +430,20 @@ while ($row = $result->fetch_assoc()) :
   </div>
   </footer>
 
-  <script>
-document.addEventListener('DOMContentLoaded', function () {
-    checkLoginStatus();
+<script src="https://cdn.tiny.cloud/1/vrej5pr2uezlfcthiog7fdmdr7bhoa1eh7tf3165pa0x199l/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
 
-    async function checkLoginStatus() {
-        try {
-            const response = await fetch('is_logged_in.php');
-            if (!response.ok) {
-                throw new Error('Sunucudan geçerli bir yanıt alınamadı');
-            }
-
-            const data = await response.json();
-
-            // Blog Ekleme Formu
-            const blogWarning = document.getElementById('blog-login-warning');
-            const blogSubmit = document.querySelector('#blog-form button[type="submit"]');
-
-            if (data.logged_in) {
-                // Kullanıcı giriş yapmışsa uyarıyı gizle ve butonu aktif et
-                if (blogWarning) blogWarning.style.display = 'none';
-                if (blogSubmit) blogSubmit.disabled = false;
-            } else {
-                // Kullanıcı giriş yapmamışsa uyarıyı göster ve butonu pasif et
-                if (blogWarning) blogWarning.style.display = 'block';
-                if (blogSubmit) blogSubmit.disabled = true;
-            }
-
-            // Mentörlük Başvuru Formu
-            const mentorWarning = document.getElementById('mentor-login-warning');
-            const mentorSubmit = document.querySelector('#mentor-form button[type="submit"]');
-
-            if (data.logged_in) {
-                // Kullanıcı giriş yapmışsa uyarıyı gizle ve butonu aktif et
-                if (mentorWarning) mentorWarning.style.display = 'none';
-                if (mentorSubmit) mentorSubmit.disabled = false;
-            } else {
-                // Kullanıcı giriş yapmamışsa uyarıyı göster ve butonu pasif et
-                if (mentorWarning) mentorWarning.style.display = 'block';
-                if (mentorSubmit) mentorSubmit.disabled = true;
-            }
-        } catch (error) {
-            console.error('Giriş durumu kontrol edilirken bir hata oluştu:', error);
-        }
-    }
+<script>
+tinymce.init({
+    selector: '#postContent',
+    plugins: 'image link media',
+    toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | image link media',
+    image_title: true,
+    automatic_uploads: true,
+    images_upload_url: 'upload_image.php', // Görsel yüklemek için bir PHP dosyası
+    file_picker_types: 'image',
+    content_style: 'img {max-width: 100%; height: auto;}'
 });
-
-  </script>
+</script>
 
   <script src="js/chat.js"></script>
 

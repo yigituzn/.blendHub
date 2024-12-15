@@ -57,7 +57,7 @@ if (isset($_SESSION['user_id'])) {
     body {
       margin: 0;
       padding: 0;
-      background-image: url('Images/accountpage.jpg');
+      background-image: url('images/accountpage.jpg');
       background-size: cover;
       background-repeat: no-repeat;
       font-family: 'Poppins', sans-serif;

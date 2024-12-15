@@ -192,7 +192,11 @@ if ($result->num_rows === 0) {
                   </h3>
                   <ul class="card-meta list-inline">
                     <li class="list-inline-item">
-                      <i class="ti-calendar"></i> <?php echo (new DateTime($row['created_at']))->format('d M Y'); ?>
+                      <i class="ti-calendar"></i>
+                      <?php
+                        $formatter = new IntlDateFormatter('tr_TR', IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+                        echo $formatter->format(new DateTime($row['created_at']));
+                      ?>
                     </li>
                   </ul>
                   <p><?php echo htmlspecialchars(substr($row['content'], 0, 150)) . '...'; ?></p>

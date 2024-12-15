@@ -126,27 +126,3 @@ $(window).on('load', function () {
 
 
 })(jQuery);
-
-document.getElementById('blog-form').addEventListener('submit', function(event) {
-	const fileInput = document.getElementById('featuredImage');
-	const file = fileInput.files[0];
-
-	if (file) {
-		const allowedTypes = ['image/jpeg', 'image/png'];
-		const maxSize = 5 * 1024 * 1024; // 5MB
-
-		// Dosya türü kontrolü
-		if (!allowedTypes.includes(file.type)) {
-			alert('Yalnızca JPG ve PNG dosyaları kabul edilmektedir.');
-			event.preventDefault();
-			return;
-		}
-
-		// Dosya boyutu kontrolü
-		if (file.size > maxSize) {
-			alert('Dosya boyutu 5MB\'yi geçemez.');
-			event.preventDefault();
-			return;
-		}
-	}
-});

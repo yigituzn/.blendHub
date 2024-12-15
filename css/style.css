@@ -769,6 +769,7 @@ mark {
 
 .post-slider {
   overflow: hidden;
+  object-fit: cover;
 }
 .post-slider:hover .prevArrow {
   left: 10px;

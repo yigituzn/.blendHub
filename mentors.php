@@ -207,7 +207,7 @@ if ($result->num_rows > 0) {
         echo '<h3 class="mb-2"><a href="profile.php?slug=' . urlencode($row['slug']) . '" class="post-title">' . $username . '</a></h3>';
         echo '<p class="mb-3">' . $expertise . '</p>';
         echo '<p>Şu tarihten itibaren üye: ' . $membership_duration . '</p>';
-        echo '<a class="post-count" href="author-single.html#post"><i class="ti-pencil-alt mr-2"></i><span class="text-primary">' . $post_count . '</span> Gönderi</a>';
+        echo '<i class="ti-pencil-alt mr-2"></i><span class="text-primary">' . $post_count . '</span> Gönderi';
         echo '</div>';
         echo '</div>';
     }

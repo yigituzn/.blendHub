@@ -1,8 +1,8 @@
 <?php
-$host = '34.159.84.150'; // Cloud SQL'in genel IP adresi
-$user = 'root'; // MySQL kullanıcı adı
-$password = ''; // Root şifresi
-$database = 'blendhub'; // Veritabanı adı
+$host = '34.159.84.150';
+$user = 'root';
+$password = '';
+$database = 'blendhub';
 
 $conn = new mysqli($host, $user, $password, $database);
 
