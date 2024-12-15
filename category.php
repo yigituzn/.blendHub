@@ -12,12 +12,15 @@ if (!$category_name) {
 }
 
 // Kategoriye ait blogları çekmek için SQL sorgusu
-$sql = "SELECT posts.post_id, posts.title, posts.content, posts.created_at, posts.featured_image 
-        FROM posts 
+$sql = "SELECT posts.post_id, posts.title, posts.content, posts.created_at, posts.featured_image, 
+               users.username, users.slug, users.profile_picture
+        FROM posts
         INNER JOIN postcategories ON posts.post_id = postcategories.post_id
         INNER JOIN categories ON postcategories.category_id = categories.category_id
+        INNER JOIN users ON posts.user_id = users.user_id
         WHERE categories.name = ? AND posts.status = 'published'
         ORDER BY posts.created_at DESC LIMIT ? OFFSET ?";
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("sii", $category_name, $blogs_per_page, $offset);
 $stmt->execute();
@@ -38,6 +41,11 @@ $total_pages = ceil($total_blogs / $blogs_per_page);
 
 $recent_posts_sql = "SELECT post_id, title, content, created_at FROM posts WHERE status = 'published' ORDER BY created_at DESC LIMIT 3";
 $recent_posts_result = $conn->query($recent_posts_sql);
+
+function calculateReadingTime($content, $words_per_minute = 200) {
+  $word_count = str_word_count(strip_tags($content));
+  return max(ceil($word_count / $words_per_minute), 1);
+}
 ?>
 <!DOCTYPE html>
 <html lang="tr-TR"><head>
@@ -84,6 +92,11 @@ $recent_posts_result = $conn->query($recent_posts_sql);
           <li class="nav-item">
             <a class="nav-link" href="about.php">hakkımızda</a>
           </li>
+          <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+          <li class="nav-item">
+            <a class="nav-link" href="admin-panel.php">Panel</a>
+          </li>
+          <?php endif; ?>
         </ul>
       </div>
 
@@ -129,35 +142,75 @@ $recent_posts_result = $conn->query($recent_posts_sql);
     <div class="col-lg-8 mb-5 mb-lg-0">
     <h1 class="h2 mb-4"><mark><?php echo htmlspecialchars($category_name); ?></mark> Kategorisi</h1>
     <?php while ($row = $result->fetch_assoc()): ?>
-        <article class="card mb-4">
-            <?php if (!empty($row['featured_image'])): ?>
-                <div class="post-slider">
-                    <img src="data:image/jpeg;base64,<?php echo $row['featured_image']; ?>" class="card-img-top" alt="post-thumb">
-                </div>
-            <?php endif; ?>
-            <div class="card-body">
-                <h3 class="mb-3">
-                    <a class="post-title" href="post-details.php?post_id=<?php echo $row['post_id']; ?>">
-                        <?php echo htmlspecialchars($row['title']); ?>
+      <article class="card mb-4">
+        <div class="post-slider">
+        <?php
+        preg_match_all('/<img[^>]+src="([^">]+)"/', $row['content'], $matches);
+        if (!empty($matches[1])) :
+            foreach ($matches[1] as $img_src) : ?>
+          <div>
+            <img src="<?php echo htmlspecialchars($img_src, ENT_QUOTES, 'UTF-8'); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($row['title'], ENT_QUOTES, 'UTF-8'); ?>">
+          </div>
+        <?php 
+            endforeach;
+        endif; ?>
+        </div>
+        <div class="card-body">
+            <h3 class="mb-3">
+                <a class="post-title" href="post-details.php?post_id=<?php echo $row['post_id']; ?>">
+                    <?php echo htmlspecialchars($row['title'], ENT_QUOTES, 'UTF-8'); ?>
+                </a>
+            </h3>
+            <ul class="card-meta list-inline">
+                <li class="list-inline-item">
+                    <a href="profile.php?slug=<?php echo $row['slug']; ?>" class="card-meta-author">
+                        <img src="<?php echo !empty($row['profile_picture']) ? 'data:image/png;base64,' . $row['profile_picture'] : 'images/dprofile.jpg'; ?>" alt="<?php echo htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8'); ?>">
+                        <span><?php echo htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8'); ?></span>
                     </a>
-                </h3>
-                <ul class="card-meta list-inline">
-                    <li class="list-inline-item">
-                        <i class="ti-calendar"></i>
-                        <?php 
-                        $tarih = $row['created_at'];
-                        $date = new DateTime($tarih);
+                </li>
+                <li class="list-inline-item">
+                    <i class="ti-timer"></i> <?php $reading_time = calculateReadingTime($row['content']); echo $reading_time; ?> dk. okunabilir
+                </li>
+                <li class="list-inline-item">
+                    <i class="ti-calendar"></i> <?php 
+                      $tarih = $row['created_at'];
+                      $date = new DateTime($tarih);
 
-                        $formatter = new IntlDateFormatter('tr_TR', IntlDateFormatter::LONG, IntlDateFormatter::NONE);
-                        echo $formatter->format($date);?>
-                    </li>
-                </ul>
-                <p><?php echo htmlspecialchars(substr($row['content'], 0, 150)) . '...'; ?></p>
-                <a href="post-details.php?post_id=<?php echo $row['post_id']; ?>" class="btn btn-outline-primary">Devamını Oku</a>
-            </div>
-        </article>
+                      $formatter = new IntlDateFormatter('tr_TR', IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+                      echo $formatter->format($date);?>
+                </li>
+                <li class="list-inline-item">
+                    <ul class="card-meta-tag list-inline">
+                        <?php
+                        $category_query = "SELECT categories.name AS category_name 
+                                          FROM postcategories 
+                                          JOIN categories ON postcategories.category_id = categories.category_id 
+                                          WHERE postcategories.post_id = ?";
+                        $category_stmt = $conn->prepare($category_query);
+                        $category_stmt->bind_param("i", $post_id);
+                        $category_stmt->execute();
+                        $categories_result = $category_stmt->get_result();
+
+                        while ($category = $categories_result->fetch_assoc()) :
+                        ?>
+                            <li class="list-inline-item">
+                                <a href="category.php?category=<?php echo urlencode($category['category_name']); ?>">
+                                    <?php echo htmlspecialchars($category['category_name'], ENT_QUOTES, 'UTF-8'); ?>
+                                </a>
+                            </li>
+                        <?php endwhile; ?>
+                    </ul>
+                </li>
+            </ul>
+            <p>
+            <?php echo substr(strip_tags($row['content']), 0, 150) . '...'; ?>
+            </p>
+            <a href="post-details.php?post_id=<?php echo $row['post_id']; ?>" class="btn btn-outline-primary">Devamını Oku</a>
+        </div>
+    </article>
     <?php endwhile; ?>
-</div>
+    </div>
+
 <aside class="col-lg-4 sidebar-inner">
   <!-- categories -->
   <div class="widget widget-categories">

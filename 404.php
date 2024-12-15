@@ -45,6 +45,11 @@ session_start();
           <li class="nav-item">
             <a class="nav-link" href="about.php">hakkımızda</a>
           </li>
+          <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+          <li class="nav-item">
+            <a class="nav-link" href="admin-panel.php">Panel</a>
+          </li>
+          <?php endif; ?>
         </ul>
       </div>
 

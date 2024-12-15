@@ -1,17 +1,7 @@
 <?php
 $error_message = ''; // Hata mesajı için bir değişken tanımlayın
 
-// Veritabanı bağlantısı
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "blendhub";
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Bağlantıyı kontrol et
-if ($conn->connect_error) {
-    die("Bağlantı hatası: " . $conn->connect_error);
-}
+include 'db_connection.php';
 
 // Form gönderildiğinde
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

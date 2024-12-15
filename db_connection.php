@@ -1,5 +1,6 @@
 <?php
-$host = 'localhost';
+//$host = 'localhost';
+$host = '34.159.78.122';
 $user = 'root';
 $password = '';
 //$password = 'nV~]<)euXOV6iKzy';

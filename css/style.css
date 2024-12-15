@@ -769,6 +769,7 @@ mark {
 
 .post-slider {
   overflow: hidden;
+  max-height: 400px;
   object-fit: cover;
 }
 .post-slider:hover .prevArrow {
@@ -1476,4 +1477,28 @@ mark {
   color: blue; /* Mavi renkte */
   margin-top: 5px;
 }
+
+#postCategories {
+  height: auto; /* Çoklu seçim alanı boyutunu ayarlar */
+  min-height: 100px;
+}
+
+.chart-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin: 100px -10px auto 30px; /* Kenar boşluklarını düzenle */
+  width: 100%; /* Genişlik ayarını yap */
+}
+
+.chart-container {
+  flex: 0 0 calc(50% - 20px); /* Her bir grafik %50 genişlikte olacak ve arada boşluk bırakacak */
+  margin: 10px;
+  height: 300px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background-color: #fff;
+  padding: 10px;
+}
+
 /*# sourceMappingURL=style.css.map */

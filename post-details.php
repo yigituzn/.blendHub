@@ -164,6 +164,11 @@ function renderPostWithImages($content, $images) {
           <li class="nav-item">
             <a class="nav-link" href="about.php">hakkımızda</a>
           </li>
+          <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+          <li class="nav-item">
+            <a class="nav-link" href="admin-panel.php">Panel</a>
+          </li>
+          <?php endif; ?>
         </ul>
       </div>
 
@@ -222,7 +227,7 @@ function renderPostWithImages($content, $images) {
               </a>
             </li>
             <li class="list-inline-item">
-              <i class="ti-timer"></i><?php echo $reading_time; ?> dakikada okuyabilirsiniz
+              <i class="ti-timer"></i><?php echo $reading_time; ?> dk. okunabilir
             </li>
             <li class="list-inline-item">
               <i class="ti-calendar"></i>

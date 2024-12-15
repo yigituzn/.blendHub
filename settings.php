@@ -94,6 +94,8 @@ $conn->close();
     <link rel="stylesheet" href="plugins/themify-icons/themify-icons.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/chat.css" media="screen">
+    <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
+    <link rel="icon" href="images/favicon.png" type="image/x-icon">
 </head>
 <body>
 <header class="navigation fixed-top">
@@ -123,6 +125,11 @@ $conn->close();
           <li class="nav-item">
             <a class="nav-link" href="about.php">hakkımızda</a>
           </li>
+          <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+          <li class="nav-item">
+            <a class="nav-link" href="admin-panel.php">Panel</a>
+          </li>
+          <?php endif; ?>
         </ul>
       </div>
 

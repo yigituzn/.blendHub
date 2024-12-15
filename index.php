@@ -49,6 +49,11 @@ session_start();
           <li class="nav-item">
             <a class="nav-link" href="about.php">hakkımızda</a>
           </li>
+          <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+          <li class="nav-item">
+            <a class="nav-link" href="admin-panel.php">Panel</a>
+          </li>
+          <?php endif; ?>
         </ul>
       </div>
 
@@ -132,16 +137,8 @@ setlocale(LC_TIME, 'tr_TR.UTF-8', 'turkish');
 
 // Fonksiyon: Okuma süresi hesaplama
 function calculateReadingTime($content, $words_per_minute = 200) {
-    $cleaned_content = strip_tags($content);
-    $cleaned_content = preg_replace('/[^\w\s]/u', '', $cleaned_content); // Noktalama işaretlerini kaldır
-    $cleaned_content = trim(preg_replace('/\s+/', ' ', $cleaned_content)); // Çoklu boşlukları temizle
-    $word_count = str_word_count($cleaned_content);
-
-    if ($word_count === 0) {
-        return 1; // Minimum okuma süresi
-    }
-
-    return ceil($word_count / $words_per_minute);
+  $word_count = str_word_count(strip_tags($content));
+  return max(ceil($word_count / $words_per_minute), 1);
 }
 
 // Blog içeriklerini çek ve listele
@@ -149,19 +146,16 @@ while ($row = $result->fetch_assoc()) :
     $content = $row['content'];
     $reading_time = calculateReadingTime($content);
     $post_id = $row['post_id'];
-
 ?>
 <article class="card mb-4">
     <div class="post-slider">
     <?php
     preg_match_all('/<img[^>]+src="([^">]+)"/', $row['content'], $matches);
-
     if (!empty($matches[1])) :
-        foreach ($matches[1] as $img_src) :
-    ?>
-            <div>
-                <img src="<?php echo htmlspecialchars($img_src, ENT_QUOTES, 'UTF-8'); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($row['title'], ENT_QUOTES, 'UTF-8'); ?>">
-            </div>
+        foreach ($matches[1] as $img_src) : ?>
+      <div>
+        <img src="<?php echo htmlspecialchars($img_src, ENT_QUOTES, 'UTF-8'); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($row['title'], ENT_QUOTES, 'UTF-8'); ?>">
+      </div>
     <?php 
         endforeach;
     endif; ?>
@@ -244,6 +238,25 @@ while ($row = $result->fetch_assoc()) :
               <input type="text" class="form-control" id="postTitle" name="title" required>
           </div>
           <div class="form-group">
+            <label>Kategoriler</label>
+            <div class="d-flex flex-wrap">
+            <?php
+              include 'db_connection.php';
+
+              $category_query = "SELECT category_id, name FROM categories";
+              $categories_result = $conn->query($category_query);
+              while ($category = $categories_result->fetch_assoc()): ?>
+                <div class="form-check mr-3 mb-2">
+                  <input class="form-check-input" type="checkbox" name="categories[]" value="<?php echo $category['category_id']; ?>" id="category_<?php echo $category['category_id']; ?>">
+                  <label class="form-check-label" for="category_<?php echo $category['category_id']; ?>">
+                    <?php echo htmlspecialchars($category['name']); ?>
+                  </label>
+                </div>
+            <?php endwhile; ?>
+            </div>
+            <small class="form-text text-muted">Birden fazla kategori seçebilirsiniz.</small>
+          </div>
+          <div class="form-group">
               <label for="postContent">İçerik</label>
               <textarea id="postContent" name="content" rows="10"></textarea>
           </div>
@@ -256,24 +269,6 @@ while ($row = $result->fetch_assoc()) :
           <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
       </div>
   </form>
-      <!--
-      <form id="blog-form" method="POST" action="add_post.php" enctype="multipart/form-data">
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="postTitle">Başlık</label>
-            <input type="text" class="form-control" id="postTitle" name="title" required>
-          </div>
-          <div class="form-group">
-            <label for="postContent">İçerik</label>
-            <textarea class="form-control" id="postContent" name="content" rows="10" required></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Paylaş</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-        </div>
-      </form>
-      -->
     </div>
   </div>
 </div>

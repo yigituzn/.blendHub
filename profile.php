@@ -51,7 +51,7 @@ if ($interval->y > 0) {
     $membership_duration = $interval->d . " gün";
 }
 
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = isset($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
 $blogs_per_page = 5;
 $offset = ($page - 1) * $blogs_per_page;
 
@@ -154,6 +154,11 @@ $conn->close();
           <li class="nav-item">
             <a class="nav-link" href="about.php">hakkımızda</a>
           </li>
+          <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+          <li class="nav-item">
+            <a class="nav-link" href="admin-panel.php">Panel</a>
+          </li>
+          <?php endif; ?>
         </ul>
       </div>
 
@@ -210,17 +215,6 @@ $conn->close();
 					
 					<a class="post-count mb-1"><i class="ti-pencil-alt mr-2"></i><span
 							class="text-primary"><?php echo $total_posts; ?></span> Gönderi</a>
-					<ul class="list-inline social-icons">
-						
-						<li class="list-inline-item"><a href="#"><i class="ti-facebook"></i></a></li>
-						
-						<li class="list-inline-item"><a href="#"><i class="ti-twitter-alt"></i></a></li>
-						
-						<li class="list-inline-item"><a href="#"><i class="ti-github"></i></a></li>
-						
-						<li class="list-inline-item"><a href="#"><i class="ti-link"></i></a></li>
-						
-					</ul>
 			</div>
 		</div>
 	</div>
@@ -302,19 +296,19 @@ $conn->close();
 <ul class="pagination justify-content-center">
     <?php if ($page > 1): ?>
         <li class="page-item">
-            <a href="?page=<?php echo $page - 1; ?>" class="page-link">&laquo;</a>
+            <a href="?slug=<?php echo urlencode($slug); ?>&page=<?php echo $page - 1; ?>" class="page-link">&laquo;</a>
         </li>
     <?php endif; ?>
 
     <?php for ($i = 1; $i <= $total_pages; $i++): ?>
         <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-            <a href="?page=<?php echo $i; ?>" class="page-link"><?php echo $i; ?></a>
+            <a href="?slug=<?php echo urlencode($slug); ?>&page=<?php echo $i; ?>" class="page-link"><?php echo $i; ?></a>
         </li>
     <?php endfor; ?>
 
     <?php if ($page < $total_pages): ?>
         <li class="page-item">
-            <a href="?page=<?php echo $page + 1; ?>" class="page-link">&raquo;</a>
+          <a href="?slug=<?php echo urlencode($slug); ?>&page=<?php echo $page + 1; ?>" class="page-link">&raquo;</a>
         </li>
     <?php endif; ?>
 </ul>

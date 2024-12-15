@@ -10,14 +10,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
 
     // Kullanıcıyı e-posta ile bul
-    $sql = "SELECT user_id, username, password, slug, profile_picture FROM users WHERE email = ?";
+    $sql = "SELECT user_id, username, password, slug, profile_picture, role FROM users WHERE email = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
 
     if ($stmt->num_rows > 0) {
-        $stmt->bind_result($user_id, $username, $dbPassword, $slug, $profile_picture);
+        $stmt->bind_result($user_id, $username, $dbPassword, $slug, $profile_picture, $role);
         $stmt->fetch();
 
         // Şifreyi kontrol et
@@ -27,6 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['username'] = $username;
             $_SESSION['slug'] = $slug; // Slug bilgisini oturuma ekle
             $_SESSION['profile_picture'] = $profile_picture; // Profil fotoğrafını oturuma ekle
+            $_SESSION['role'] = $role;
             $_SESSION['user_email'] = $_POST['email'];
             // Giriş başarılı, yönlendir
             echo "<script>window.location.href = 'index.php';</script>";
