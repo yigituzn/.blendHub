@@ -67,6 +67,7 @@ if ($result->num_rows === 0) {
   <link rel="stylesheet" href="plugins/themify-icons/themify-icons.css">
   <link rel="stylesheet" href="plugins/slick/slick.css">
   <link rel="stylesheet" href="css/style.css" media="screen">
+  <link rel="stylesheet" href="css/chat.css" media="screen">
 </head>
 <body>
 <header class="navigation fixed-top">
@@ -93,35 +94,8 @@ if ($result->num_rows === 0) {
             <a class="nav-link" href="mentors.php">mentörler</a>
           </li>
 
-          <li class="nav-item dropdown">
-            <a class="nav-link" href="about.php" role="button" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false">hakkımızda <i class="ti-angle-down ml-1"></i>
-            </a>
-            <div class="dropdown-menu">
-              
-              <a class="dropdown-item" href="author.html">Author</a>
-              
-              <a class="dropdown-item" href="author-single.html">Author Single</a>
-
-              <a class="dropdown-item" href="advertise.html">Advertise</a>
-              
-              <a class="dropdown-item" href="post-details.html">Post Details</a>
-              
-              <a class="dropdown-item" href="post-elements.html">Post Elements</a>
-              
-              <a class="dropdown-item" href="tags.html">Tags</a>
-
-              <a class="dropdown-item" href="search-result.html">Search Result</a>
-
-              <a class="dropdown-item" href="search-not-found.html">Search Not Found</a>
-              
-              <a class="dropdown-item" href="privacy-policy.html">Privacy Policy</a>
-              
-              <a class="dropdown-item" href="terms-conditions.html">Terms Conditions</a>
-
-              <a class="dropdown-item" href="404.html">404 Page</a>
-              
-            </div>
+          <li class="nav-item">
+            <a class="nav-link" href="about.php">hakkımızda</a>
           </li>
         </ul>
       </div>
@@ -160,6 +134,7 @@ if ($result->num_rows === 0) {
     </nav>
   </div>
 </header>
+<?php include 'chat-widget.html'; ?>
 
 <div class="py-3"></div>
 
@@ -236,27 +211,24 @@ if ($result->num_rows === 0) {
 
 <footer class="footer">
   <div class="container">
-    <div class="row align-items-center">
+      <div class="row align-items-center">
       <div class="col-md-5 text-center text-md-left mb-4">
-        <ul class="list-inline footer-list mb-0">
-          <li class="list-inline-item"><a href="privacy-policy.html">Privacy Policy</a></li>
-          <li class="list-inline-item"><a href="terms-conditions.html">Terms Conditions</a></li>
-        </ul>
+          <ul class="list-inline footer-list mb-0">
+            <li class="list-inline-item">© 2024 .blendHub</li>
+          </ul>
       </div>
       <div class="col-md-2 text-center mb-4">
-        <a href="index.php"><img class="img-fluid" width="100px" src="images/logo.png" alt=".blendHub"></a>
+          <a href="index.php"><img class="img-fluid" width="100px" src="images/logo.png" alt="blendHub"></a>
       </div>
       <div class="col-md-5 text-md-right text-center mb-4">
-        <ul class="list-inline footer-list mb-0">
-          <li class="list-inline-item"><a href="#"><i class="ti-facebook"></i></a></li>
-          <li class="list-inline-item"><a href="#"><i class="ti-twitter-alt"></i></a></li>
-          <li class="list-inline-item"><a href="#"><i class="ti-linkedin"></i></a></li>
-        </ul>
       </div>
-    </div>
+      <div class="col-12">
+          <div class="border-bottom border-default"></div>
+      </div>
+      </div>
   </div>
-</footer>
-
+  </footer>
+<script src="js/chat.js"></script>
 <script src="plugins/jQuery/jquery.min.js"></script>
 <script src="plugins/bootstrap/bootstrap.min.js"></script>
 <script src="plugins/slick/slick.min.js"></script>

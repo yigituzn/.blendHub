@@ -93,6 +93,7 @@ $conn->close();
     <link rel="stylesheet" href="plugins/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="plugins/themify-icons/themify-icons.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/chat.css" media="screen">
 </head>
 <body>
 <header class="navigation fixed-top">
@@ -119,35 +120,8 @@ $conn->close();
             <a class="nav-link" href="mentors.php">mentörler</a>
           </li>
 
-          <li class="nav-item dropdown">
-            <a class="nav-link" href="about.php" role="button" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false">hakkımızda <i class="ti-angle-down ml-1"></i>
-            </a>
-            <div class="dropdown-menu">
-              
-              <a class="dropdown-item" href="author.html">Author</a>
-              
-              <a class="dropdown-item" href="author-single.html">Author Single</a>
-
-              <a class="dropdown-item" href="advertise.html">Advertise</a>
-              
-              <a class="dropdown-item" href="post-details.html">Post Details</a>
-              
-              <a class="dropdown-item" href="post-elements.html">Post Elements</a>
-              
-              <a class="dropdown-item" href="tags.html">Tags</a>
-
-              <a class="dropdown-item" href="search-result.html">Search Result</a>
-
-              <a class="dropdown-item" href="search-not-found.html">Search Not Found</a>
-              
-              <a class="dropdown-item" href="privacy-policy.html">Privacy Policy</a>
-              
-              <a class="dropdown-item" href="terms-conditions.html">Terms Conditions</a>
-
-              <a class="dropdown-item" href="404.html">404 Page</a>
-              
-            </div>
+          <li class="nav-item">
+            <a class="nav-link" href="about.php">hakkımızda</a>
           </li>
         </ul>
       </div>
@@ -186,6 +160,7 @@ $conn->close();
     </nav>
   </div>
 </header>
+<?php include 'chat-widget.html'; ?>
 <div class="py-5"></div>
 
 <section class="section">
@@ -268,19 +243,6 @@ $conn->close();
           <a href="index.php"><img class="img-fluid" width="100px" src="images/logo.png" alt="blendHub"></a>
       </div>
       <div class="col-md-5 text-md-right text-center mb-4">
-          <ul class="list-inline footer-list mb-0">
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-facebook"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-twitter-alt"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-linkedin"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-github"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-youtube"></i></a></li>
-          
-          </ul>
       </div>
       <div class="col-12">
           <div class="border-bottom border-default"></div>
@@ -288,7 +250,7 @@ $conn->close();
       </div>
   </div>
   </footer>
-
+  <script src="js/chat.js"></script>
 <script src="plugins/jQuery/jquery.min.js"></script>
 <script src="plugins/bootstrap/bootstrap.min.js"></script>
 </body>

@@ -1,7 +1,8 @@
 <?php
-$host = '34.159.84.150';
+$host = 'localhost';
 $user = 'root';
 $password = '';
+//$password = 'nV~]<)euXOV6iKzy';
 $database = 'blendhub';
 
 $conn = new mysqli($host, $user, $password, $database);

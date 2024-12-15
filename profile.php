@@ -7,7 +7,7 @@ include 'db_connection.php';
 $slug = $_GET['slug'] ?? null;
 
 if (!$slug) {
-    die(header("Location: 404.html"));
+    die(header("Location: 404.php"));
 }
 
 $sql = "SELECT user_id, username, created_at, profile_picture, role FROM users WHERE slug = ?";
@@ -31,7 +31,7 @@ if ($result->num_rows > 0) {
         $role_display = 'Yönetici';
     }
 } else {
-    die(header("Location: 404.html"));
+    die(header("Location: 404.php"));
 }
 
 // Kullanıcı kayıt tarihi
@@ -86,6 +86,23 @@ function calculateReadingTime($content, $words_per_minute = 200) {
   return max(ceil($word_count / $words_per_minute), 1);
 }
 
+function cleanContent($content, $limit = 150) {
+  // <img> etiketlerini temizle
+  $content_without_images = preg_replace('/<img[^>]*>/', '', $content);
+  
+  // HTML etiketlerinden temizlik
+  $cleaned_content = strip_tags($content_without_images);
+  
+  // HTML entity'lerini dönüştür
+  $decoded_content = html_entity_decode($cleaned_content, ENT_QUOTES, 'UTF-8');
+  
+  // Gereksiz boşlukları temizle
+  $decoded_content = preg_replace('/\s+/', ' ', $decoded_content);
+  
+  // İlk 150 karakteri döndür
+  return mb_substr(trim($decoded_content), 0, $limit, 'UTF-8') . '...';
+}
+
 $post_stmt->close();
 $stmt->close();
 $conn->close();
@@ -97,17 +114,14 @@ $conn->close();
   <title>.blendHub | <?php echo htmlspecialchars($user['username']); ?></title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
-  <!-- plugins -->
   
   <link rel="stylesheet" href="plugins/bootstrap/bootstrap.min.css">
   <link rel="stylesheet" href="plugins/themify-icons/themify-icons.css">
   <link rel="stylesheet" href="plugins/slick/slick.css">
 
-  <!-- Main Stylesheet -->
   <link rel="stylesheet" href="css/style.css" media="screen">
+  <link rel="stylesheet" href="css/chat.css" media="screen">
 
-  <!--Favicon-->
   <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
   <link rel="icon" href="images/favicon.png" type="image/x-icon">
   <link rel="stylesheet" href="/css/profilephoto.css">
@@ -137,42 +151,15 @@ $conn->close();
             <a class="nav-link" href="mentors.php">mentörler</a>
           </li>
 
-          <li class="nav-item dropdown">
-            <a class="nav-link" href="about.php" role="button" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false">hakkımızda <i class="ti-angle-down ml-1"></i>
-            </a>
-            <div class="dropdown-menu">
-              
-              <a class="dropdown-item" href="author.html">Author</a>
-              
-              <a class="dropdown-item" href="author-single.html">Author Single</a>
-
-              <a class="dropdown-item" href="advertise.html">Advertise</a>
-              
-              <a class="dropdown-item" href="post-details.html">Post Details</a>
-              
-              <a class="dropdown-item" href="post-elements.html">Post Elements</a>
-              
-              <a class="dropdown-item" href="tags.html">Tags</a>
-
-              <a class="dropdown-item" href="search-result.html">Search Result</a>
-
-              <a class="dropdown-item" href="search-not-found.html">Search Not Found</a>
-              
-              <a class="dropdown-item" href="privacy-policy.html">Privacy Policy</a>
-              
-              <a class="dropdown-item" href="terms-conditions.html">Terms Conditions</a>
-
-              <a class="dropdown-item" href="404.html">404 Page</a>
-              
-            </div>
+          <li class="nav-item">
+            <a class="nav-link" href="about.php">hakkımızda</a>
           </li>
         </ul>
       </div>
 
       <div class="order-2 order-lg-3 d-flex align-items-center">
         
-        <form class="search-bar">
+        <form class="search-bar" method="GET" action="search-result.php">
           <input id="search-query" name="s" type="search" placeholder="Type &amp; Hit Enter...">
         </form>
         
@@ -204,6 +191,7 @@ $conn->close();
     </nav>
   </div>
 </header>
+<?php include 'chat-widget.html'; ?>
 
 <div class="author">
 	<div class="container">
@@ -247,11 +235,18 @@ $conn->close();
       ?>
 				<div class="col-lg-8 mx-auto">
 					<article class="card mb-4">
-						<?php if (!empty($post['featured_image'])): ?>
-						<div class="post-slider">
-							<img src="data:image/jpeg;base64,<?php echo $post['featured_image']; ?>" class="card-img-top" alt="post-thumb">
-						</div>
-						<?php endif; ?>
+            <?php
+              // Resim kontrolü
+              preg_match_all('/<img[^>]+src="([^">]+)"/', $post['content'], $matches);
+              if (!empty($matches[1])) : ?>
+              <div class="post-slider">
+              <?php foreach ($matches[1] as $img_src) : ?>
+                      <div>
+                        <img src="<?php echo htmlspecialchars($img_src, ENT_QUOTES, 'UTF-8'); ?>" class="card-img" style="height:200px; object-fit: cover;">
+                      </div>
+                    <?php endforeach; ?>
+              </div>
+              <?php endif; ?> 
 						<div class="card-body">
 							<h3 class="mb-3">
                 <a class="post-title" href="post-details.php?post_id=<?php echo $post['post_id']; ?>">
@@ -294,7 +289,7 @@ $conn->close();
                 </ul>
             </li>
 							</ul>
-							<p><?php echo htmlspecialchars(substr($post['content'], 0, 150)) . '...'; ?></p>
+							<p><?php echo htmlspecialchars(cleanContent($post['content'])); ?></p>
 							<a href="post-details.php?post_id=<?php echo $post['post_id']; ?>" class="btn btn-outline-primary">Devamını Oku</a>
 						</div>
 					</article>
@@ -329,27 +324,13 @@ $conn->close();
       <div class="row align-items-center">
       <div class="col-md-5 text-center text-md-left mb-4">
           <ul class="list-inline footer-list mb-0">
-            <li class="list-inline-item"><a href="privacy-policy.html">Privacy Policy</a></li>
-            <li class="list-inline-item"><a href="terms-conditions.html">Terms Conditions</a></li>
+            <li class="list-inline-item">© 2024 .blendHub</li>
           </ul>
       </div>
       <div class="col-md-2 text-center mb-4">
-          <a href="index.html"><img class="img-fluid" width="100px" src="images/logo.png" alt="Reader | Hugo Personal Blog Template"></a>
+          <a href="index.php"><img class="img-fluid" width="100px" src="images/logo.png" alt="blendHub"></a>
       </div>
       <div class="col-md-5 text-md-right text-center mb-4">
-          <ul class="list-inline footer-list mb-0">
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-facebook"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-twitter-alt"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-linkedin"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-github"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-youtube"></i></a></li>
-          
-          </ul>
       </div>
       <div class="col-12">
           <div class="border-bottom border-default"></div>
@@ -358,8 +339,8 @@ $conn->close();
   </div>
   </footer>
 
+  <script src="js/chat.js"></script>
 
-  <!-- JS Plugins -->
   <script src="plugins/jQuery/jquery.min.js"></script>
 
   <script src="plugins/bootstrap/bootstrap.min.js"></script>
@@ -368,7 +349,5 @@ $conn->close();
 
   <script src="plugins/instafeed/instafeed.min.js"></script>
 
-
-  <!-- Main Script -->
   <script src="js/script.js"></script></body>
 </html>

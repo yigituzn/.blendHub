@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['profile_picture'] = $profile_picture; // Profil fotoğrafını oturuma ekle
             $_SESSION['user_email'] = $_POST['email'];
             // Giriş başarılı, yönlendir
-            echo "<script>alert('Giriş başarılı!'); window.location.href = 'index.php';</script>";
+            echo "<script>window.location.href = 'index.php';</script>";
             exit; // İşlemi sonlandır
         } else {
             $error_message = 'Geçersiz şifre!';
@@ -53,6 +53,8 @@ if (isset($_SESSION['user_id'])) {
   <meta charset="utf-8">
   <title>.blendHub | Giriş Yap</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@400;700&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
+  <link rel="icon" href="images/favicon.png" type="image/x-icon">
   <style>
     body {
       margin: 0;

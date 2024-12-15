@@ -46,35 +46,8 @@ session_start();
             <a class="nav-link" href="mentors.php">mentörler</a>
           </li>
 
-          <li class="nav-item dropdown">
-            <a class="nav-link" href="about.php" role="button" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false">hakkımızda <i class="ti-angle-down ml-1"></i>
-            </a>
-            <div class="dropdown-menu">
-              
-              <a class="dropdown-item" href="author.html">Author</a>
-              
-              <a class="dropdown-item" href="author-single.html">Author Single</a>
-
-              <a class="dropdown-item" href="advertise.html">Advertise</a>
-              
-              <a class="dropdown-item" href="post-details.html">Post Details</a>
-              
-              <a class="dropdown-item" href="post-elements.html">Post Elements</a>
-              
-              <a class="dropdown-item" href="tags.html">Tags</a>
-
-              <a class="dropdown-item" href="search-result.html">Search Result</a>
-
-              <a class="dropdown-item" href="search-not-found.html">Search Not Found</a>
-              
-              <a class="dropdown-item" href="privacy-policy.html">Privacy Policy</a>
-              
-              <a class="dropdown-item" href="terms-conditions.html">Terms Conditions</a>
-
-              <a class="dropdown-item" href="404.html">404 Page</a>
-              
-            </div>
+          <li class="nav-item">
+            <a class="nav-link" href="about.php">hakkımızda</a>
           </li>
         </ul>
       </div>
@@ -275,11 +248,11 @@ while ($row = $result->fetch_assoc()) :
               <textarea id="postContent" name="content" rows="10"></textarea>
           </div>
       </div>
+      <p id="mentor-login-warning" style="color: red; margin-left: 10px; <?php echo isset($_SESSION['user_id']) ? 'display: none;' : ''; ?>">
+          Blog paylaşabilmek için <a href="login.php">giriş yapınız.</a>
+      </p>
       <div class="modal-footer">
-      <p id="mentor-login-warning" style="color: red; display: none;">
-                Blog paylaşabilmek için <a href="login.php">giriş yapınız.</a>
-            </p>
-          <button type="submit" class="btn btn-primary">Paylaş</button>
+      <button type="submit" class="btn btn-primary" <?php echo isset($_SESSION['user_id']) ? '' : 'disabled'; ?>>Paylaş</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
       </div>
   </form>
@@ -344,10 +317,10 @@ while ($row = $result->fetch_assoc()) :
                 <label for="expertise">Uzmanlık Alanı</label>
                 <input type="text" id="expertise" name="expertise" class="form-control" required>
             </div>
-            <p id="mentor-login-warning" style="color: red; display: none;">
+            <p id="mentor-login-warning" style="color: red; <?php echo isset($_SESSION['user_id']) ? 'display: none;' : ''; ?>"> 
                 Mentörlük başvurusu yapabilmek için <a href="login.php">giriş yapınız.</a>
             </p>
-            <button type="submit" class="btn btn-primary">Başvur</button>
+            <button type="submit" class="btn btn-primary" <?php echo isset($_SESSION['user_id']) ? '' : 'disabled'; ?>>Başvur</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
       </form>
       </div>
@@ -401,27 +374,13 @@ while ($row = $result->fetch_assoc()) :
       <div class="row align-items-center">
       <div class="col-md-5 text-center text-md-left mb-4">
           <ul class="list-inline footer-list mb-0">
-            <li class="list-inline-item"><a href="privacy-policy.html">Privacy Policy</a></li>
-            <li class="list-inline-item"><a href="terms-conditions.html">Terms Conditions</a></li>
+            <li class="list-inline-item">© 2024 .blendHub</li>
           </ul>
       </div>
       <div class="col-md-2 text-center mb-4">
           <a href="index.php"><img class="img-fluid" width="100px" src="images/logo.png" alt="blendHub"></a>
       </div>
       <div class="col-md-5 text-md-right text-center mb-4">
-          <ul class="list-inline footer-list mb-0">
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-facebook"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-twitter-alt"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-linkedin"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-github"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-youtube"></i></a></li>
-          
-          </ul>
       </div>
       <div class="col-12">
           <div class="border-bottom border-default"></div>

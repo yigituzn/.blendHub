@@ -46,11 +46,13 @@ $conn->close();
   <meta charset="UTF-8">
   <title>.blendHub | Şifremi Unuttum</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@400;700&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
+  <link rel="icon" href="images/favicon.png" type="image/x-icon">
   <style>
     body {
       margin: 0;
       padding: 0;
-      background-image: url('Images/accountpage.jpg');
+      background-image: url('images/accountpage.jpg');
       background-size: cover;
       background-repeat: no-repeat;
       font-family: 'Poppins', sans-serif;

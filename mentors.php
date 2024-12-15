@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="plugins/slick/slick.css">
 
   <link rel="stylesheet" href="css/style.css" media="screen">
+  <link rel="stylesheet" href="css/chat.css" media="screen">
 
   <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
   <link rel="icon" href="images/favicon.png" type="image/x-icon">
@@ -25,85 +26,29 @@
       <div class="collapse navbar-collapse text-center order-lg-2 order-3" id="navigation">
         <ul class="navbar-nav mx-auto">
           <li class="nav-item dropdown">
-            <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false">
-              anasayfa <i class="ti-angle-down ml-1"></i>
+            <a class="nav-link" href="index.php">
+              anasayfa
             </a>
-            <div class="dropdown-menu">
-              <a class="dropdown-item" href="index-full.html">Homepage Full Width</a>
-              
-              <a class="dropdown-item" href="index-full-left.html">Homepage Full With Left Sidebar</a>
-              
-              <a class="dropdown-item" href="index-full-right.html">Homepage Full With Right Sidebar</a>
-              
-              <a class="dropdown-item" href="index-list.html">Homepage List Style</a>
-              
-              <a class="dropdown-item" href="index-list-left.html">Homepage List With Left Sidebar</a>
-              
-              <a class="dropdown-item" href="index-list-right.html">Homepage List With Right Sidebar</a>
-              
-              <a class="dropdown-item" href="index-grid.html">Homepage Grid Style</a>
-              
-              <a class="dropdown-item" href="index-grid-left.html">Homepage Grid With Left Sidebar</a>
-              
-              <a class="dropdown-item" href="index-grid-right.html">Homepage Grid With Right Sidebar</a>
-              
-            </div>
           </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link" href="blogs.php" role="button" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false">
-              yazılar <i class="ti-angle-down ml-1"></i>
+          <li class="nav-item">
+            <a class="nav-link" href="blogs.php">
+              yazılar
             </a>
-            <div class="dropdown-menu">
-              
-              <a class="dropdown-item" href="about-me.html">About Me</a>
-              
-              <a class="dropdown-item" href="about-us.html">About Us</a>
-              
-            </div>
           </li>
 
           <li class="nav-item">
             <a class="nav-link" href="mentors.php">mentörler</a>
           </li>
 
-          <li class="nav-item dropdown">
-            <a class="nav-link" href="about.php" role="button" data-toggle="dropdown" aria-haspopup="true"
-              aria-expanded="false">hakkımızda <i class="ti-angle-down ml-1"></i>
-            </a>
-            <div class="dropdown-menu">
-              
-              <a class="dropdown-item" href="author.html">Author</a>
-              
-              <a class="dropdown-item" href="author-single.html">Author Single</a>
-
-              <a class="dropdown-item" href="advertise.html">Advertise</a>
-              
-              <a class="dropdown-item" href="post-details.html">Post Details</a>
-              
-              <a class="dropdown-item" href="post-elements.html">Post Elements</a>
-              
-              <a class="dropdown-item" href="tags.html">Tags</a>
-
-              <a class="dropdown-item" href="search-result.html">Search Result</a>
-
-              <a class="dropdown-item" href="search-not-found.html">Search Not Found</a>
-              
-              <a class="dropdown-item" href="privacy-policy.html">Privacy Policy</a>
-              
-              <a class="dropdown-item" href="terms-conditions.html">Terms Conditions</a>
-
-              <a class="dropdown-item" href="404.html">404 Page</a>
-              
-            </div>
+          <li class="nav-item">
+            <a class="nav-link" href="about.php">hakkımızda</a>
           </li>
         </ul>
       </div>
 
       <div class="order-2 order-lg-3 d-flex align-items-center">
         
-        <form class="search-bar">
+        <form class="search-bar" method="GET" action="search-result.php">
           <input id="search-query" name="s" type="search" placeholder="Type &amp; Hit Enter...">
         </form>
         
@@ -135,6 +80,7 @@
     </nav>
   </div>
 </header>
+<?php include 'chat-widget.html'; ?>
 <div class="text-center">
   <div class="container">
     <div class="row">
@@ -216,39 +162,24 @@ if ($result->num_rows > 0) {
     echo '</div>';
     echo '</section>';
 } else {
-    echo "Hiç mentor bulunamadı.";
+    echo '<p style="text-align: center; margin-top: 75px">Hiç mentör bulunamadı.</p>';
 }
 
 $conn->close();
 ?>
 
 <footer class="footer">
-  
   <div class="container">
       <div class="row align-items-center">
       <div class="col-md-5 text-center text-md-left mb-4">
           <ul class="list-inline footer-list mb-0">
-            <li class="list-inline-item"><a href="privacy-policy.html">Privacy Policy</a></li>
-            <li class="list-inline-item"><a href="terms-conditions.html">Terms Conditions</a></li>
+            <li class="list-inline-item">© 2024 .blendHub</li>
           </ul>
       </div>
       <div class="col-md-2 text-center mb-4">
-          <a href="index.html"><img class="img-fluid" width="100px" src="images/logo.png" alt="Reader | Hugo Personal Blog Template"></a>
+          <a href="index.php"><img class="img-fluid" width="100px" src="images/logo.png" alt="blendHub"></a>
       </div>
       <div class="col-md-5 text-md-right text-center mb-4">
-          <ul class="list-inline footer-list mb-0">
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-facebook"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-twitter-alt"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-linkedin"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-github"></i></a></li>
-          
-          <li class="list-inline-item"><a href="#"><i class="ti-youtube"></i></a></li>
-          
-          </ul>
       </div>
       <div class="col-12">
           <div class="border-bottom border-default"></div>
@@ -256,6 +187,8 @@ $conn->close();
       </div>
   </div>
   </footer>
+
+  <script src="js/chat.js"></script>
 
   <script src="plugins/jQuery/jquery.min.js"></script>
 
