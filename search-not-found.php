@@ -6,7 +6,7 @@ if (empty($_GET['s'])) {
 }
 
 function getGoogleSearchResults($query) {
-  $api_key = 'AIzaSyDlOGcn5vDv1wdspQ1KytkcKGNP6D7HqE4'; // Google API Anahtarınız
+  $api_key = 'AIzaSyAblfcqkA4RWN3fmoeRAIRNYdBzBrJIU9Q'; // Google API Anahtarınız
   $cx = '815ff1178ee9049a8'; // Custom Search Engine ID
   $url = "https://www.googleapis.com/customsearch/v1?q=" . urlencode($query) . "&key=" . $api_key . "&cx=" . $cx;
 

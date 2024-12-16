@@ -68,6 +68,8 @@ if ($result->num_rows === 0) {
   <link rel="stylesheet" href="plugins/slick/slick.css">
   <link rel="stylesheet" href="css/style.css" media="screen">
   <link rel="stylesheet" href="css/chat.css" media="screen">
+  <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
+  <link rel="icon" href="images/favicon.png" type="image/x-icon">
 </head>
 <body>
 <header class="navigation fixed-top">
@@ -157,13 +159,19 @@ if ($result->num_rows === 0) {
           <?php while ($row = $result->fetch_assoc()): ?>
             <article class="card mb-4">
               <div class="row card-body">
-                <?php if (!empty($row['featured_image'])): ?>
                 <div class="col-md-4 mb-4 mb-md-0">
+                  <?php
+                  preg_match_all('/<img[^>]+src="([^">]+)"/', $row['content'], $matches);
+                  if (!empty($matches[1])) : ?>
                   <div class="post-slider slider-sm">
-                    <img src="data:image/jpeg;base64,<?php echo $row['featured_image']; ?>" class="card-img" alt="post-thumb" style="height:200px; object-fit: cover;">
+                    <?php foreach ($matches[1] as $img_src) : ?>
+                      <div>
+                        <img src="<?php echo htmlspecialchars($img_src, ENT_QUOTES, 'UTF-8'); ?>" class="card-img" style="height:200px; object-fit: cover;" alt="<?php echo htmlspecialchars($row['title'], ENT_QUOTES, 'UTF-8'); ?>">
+                      </div>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
                   </div>
                 </div>
-                <?php endif; ?>
                 <div class="col-md-8">
                   <h3 class="h4 mb-3">
                     <a class="post-title" href="post-details.php?post_id=<?php echo $row['post_id']; ?>">
@@ -179,7 +187,7 @@ if ($result->num_rows === 0) {
                       ?>
                     </li>
                   </ul>
-                  <p><?php echo htmlspecialchars(substr($row['content'], 0, 150)) . '...'; ?></p>
+                  <p><?php echo substr(strip_tags($row['content']), 0, 150) . '...'; ?></p>
                   <a href="post-details.php?post_id=<?php echo $row['post_id']; ?>" class="btn btn-outline-primary">Devamını Oku</a>
                 </div>
               </div>
@@ -196,19 +204,19 @@ if ($result->num_rows === 0) {
 <ul class="pagination justify-content-center">
     <?php if ($page > 1): ?>
         <li class="page-item">
-            <a href="?page=<?php echo $page - 1; ?>" class="page-link">&laquo;</a>
+            <a href="search-result.php?s=<?php echo $search_query; ?>&page=<?php echo $page - 1; ?>" class="page-link">&laquo;</a>
         </li>
     <?php endif; ?>
 
     <?php for ($i = 1; $i <= $total_pages; $i++): ?>
         <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-            <a href="?page=<?php echo $i; ?>" class="page-link"><?php echo $i; ?></a>
+            <a href="search-result.php?s=<?php echo $search_query; ?>&page=<?php echo $i; ?>" class="page-link"><?php echo $i; ?></a>
         </li>
     <?php endfor; ?>
 
     <?php if ($page < $total_pages): ?>
         <li class="page-item">
-            <a href="?page=<?php echo $page + 1; ?>" class="page-link">&raquo;</a>
+            <a href="search-result.php?s=<?php echo $search_query; ?>&page=<?php echo $page + 1; ?>" class="page-link">&raquo;</a>
         </li>
     <?php endif; ?>
 </ul>
