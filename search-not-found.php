@@ -138,9 +138,6 @@ if (isset($_GET['s']) && !empty($_GET['s'])) {
 
 <div class="py-3"></div>
 
-<!--<script async src="https://cse.google.com/cse.js?cx=815ff1178ee9049a8">
-</script>
-<div class="gcse-search"></div>-->
 <section class="section">
     <div class="container">
         <div class="row justify-content-center">

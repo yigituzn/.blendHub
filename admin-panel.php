@@ -101,7 +101,7 @@ session_start();
       </div>
     </div>
   </div>
-  
+    <!-- grafikler -->
 <div class="chart-row">
     <div class="chart-container">
         <h3>Kullanıcı Artışı</h3>

@@ -264,7 +264,7 @@ function renderPostWithImages($content, $images) {
                     <img class="mr-3" src="images/post/arrow.png">
                 <?php endif; ?>
                 <a class="d-inline-block mr-2 mb-3 mb-md-0" href="profile.php?slug=<?php echo urlencode($comment['slug']); ?>">
-                  <img src="<?php echo $comment['profile_picture'] ? 'data:image/jpeg;base64,' . $comment['profile_picture'] : 'images/dprofile.jpg'; ?>" class="mr-3 rounded-circle">    
+                  <img style="border-radius: 50%; height: 70px; width: 70px; object-fit: cover;" src="<?php echo $comment['profile_picture'] ? 'data:image/jpeg;base64,' . $comment['profile_picture'] : 'images/dprofile.jpg'; ?>" class="mr-3 rounded-circle">    
                   </a>
                   <div class="media-body">
                     <a href="profile.php?slug=<?php echo urlencode($comment['slug']); ?>" class="h4 d-inline-block mb-3">
