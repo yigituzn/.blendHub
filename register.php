@@ -250,7 +250,7 @@ $conn->close();
             </div>
         <?php endif; ?>
           </div>
-
+          <h4 style="color: white;">Siteye dönmek için<a href="index.php" style="text-decoration: none; color: white;"><span class="bold-text"> tıklayın</span></a>.<h4>
           <button type="submit" class="form-button">Kayıt Ol</button>
         </form>
         <div class="login-link">

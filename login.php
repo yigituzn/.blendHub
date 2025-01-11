@@ -242,7 +242,7 @@ if (isset($_SESSION['user_id'])) {
                 <?php if (!empty($error_message)) echo $error_message; ?>
             </div>
           </div>
-
+          <h4 style="color: white;">Siteye dönmek için<a href="index.php"><span class="bold-text"> tıklayın</span></a>.<h4>
           <button type="submit" class="form-button">Giriş Yap</button>
         </form>
         <div class="login-link">
