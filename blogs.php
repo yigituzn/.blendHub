@@ -195,7 +195,7 @@ function calculateReadingTime($content, $words_per_minute = 200) {
                     </ul>
                   </li>
                 </ul>
-                <p><?php echo substr(strip_tags($row['content']), 0, 150) . '...'; ?></p>
+                <p><?php echo substr(s($row[strip_tag'content']), 0, 150) . '...'; ?></p>
                 <a href="post-details.php?post_id=<?php echo $row['post_id']; ?>" class="btn btn-outline-primary">Read More</a>
               </div>
             </div>

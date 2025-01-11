@@ -106,7 +106,7 @@ if (!isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') {
       </div>
     </div>
   </div>
-  
+    <!-- grafikler -->
 <div class="chart-row">
     <div class="chart-container">
         <h3>Kullanıcı Artışı</h3>
