@@ -56,7 +56,7 @@ session_start();
       <div class="order-2 order-lg-3 d-flex align-items-center">
         
         <form class="search-bar" method="GET" action="search-result.php">
-          <input id="search-query" name="s" type="search" placeholder="Type &amp; Hit Enter...">
+          <input id="search-query" name="s" type="search" placeholder="Type &amp; Hit Enter..." required>
         </form>
         
         <button class="navbar-toggler border-0 order-1" type="button" data-toggle="collapse" data-target="#navigation">
@@ -195,8 +195,8 @@ function calculateReadingTime($content, $words_per_minute = 200) {
                     </ul>
                   </li>
                 </ul>
-                <p><?php echo substr(s($row[strip_tag'content']), 0, 150) . '...'; ?></p>
-                <a href="post-details.php?post_id=<?php echo $row['post_id']; ?>" class="btn btn-outline-primary">Read More</a>
+                <p><?php echo substr(strip_tags($row['content']), 0, 150) . '...'; ?></p>
+                <a href="post-details.php?post_id=<?php echo $row['post_id']; ?>" class="btn btn-outline-primary">Devamını Oku</a>
               </div>
             </div>
           </article>

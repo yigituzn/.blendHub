@@ -175,7 +175,7 @@ function renderPostWithImages($content, $images) {
       <div class="order-2 order-lg-3 d-flex align-items-center">
         
         <form class="search-bar" method="GET" action="search-result.php">
-          <input id="search-query" name="s" type="search" placeholder="Type &amp; Hit Enter...">
+          <input id="search-query" name="s" type="search" placeholder="Type &amp; Hit Enter..." required>
         </form>
         
         <button class="navbar-toggler border-0 order-1" type="button" data-toggle="collapse" data-target="#navigation">
@@ -302,7 +302,10 @@ function renderPostWithImages($content, $images) {
                           <textarea class="form-control shadow-none" name="comment" rows="7" required></textarea>
                       </div>
                   </div>
-                  <button class="btn btn-primary" type="submit">Paylaş</button>
+                  <p id="login-warning" style="color: red; margin-left: 10px; <?php echo isset($_SESSION['user_id']) ? 'display: none;' : ''; ?>">
+                      Yorum yapabilmek için <a href="login.php">giriş yapınız.</a>
+                  </p>
+                  <button class="btn btn-primary" type="submit" <?php echo isset($_SESSION['user_id']) ? '' : 'disabled'; ?>>Paylaş</button>
               </form>
           </div>
       </div>
