@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->fetch();
 
         // Şifreyi kontrol et
-        if ($password === $dbPassword) { // Şifre hash'lenmişse password_verify() kullanılmalı
+        if ($password === $dbPassword) {
             // Oturum değişkenlerini ayarla
             $_SESSION['user_id'] = $user_id;
             $_SESSION['username'] = $username;
